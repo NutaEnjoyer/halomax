@@ -41,7 +41,7 @@ services:
     container_name: halo_backend
     restart: always
     ports:
-      - "127.0.0.1:8000:8000"  # Expose only to localhost for nginx proxy
+      - "127.0.0.1:8013:8000"  # Expose only to localhost for nginx proxy
     env_file:
       - backend/.env
     networks:
