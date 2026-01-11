@@ -23,8 +23,9 @@ app.add_middleware(
 )
 
 # Include routers
-app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
-app.include_router(calls.router, prefix="/api", tags=["calls"])
+# Note: nginx already adds /api prefix, so we don't add it here
+app.include_router(auth.router, prefix="/auth", tags=["auth"])
+app.include_router(calls.router, prefix="", tags=["calls"])
 
 
 @app.get("/")
