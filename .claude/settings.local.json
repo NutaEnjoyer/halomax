@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(docker-compose logs:*)",
+      "Bash(docker-compose exec:*)",
+      "Bash(curl:*)",
+      "Bash(docker-compose up:*)",
+      "Bash(npm install)",
+      "Bash(npm start)",
+      "Bash(netstat:*)",
+      "Bash(xargs:*)",
+      "Bash(taskkill //F //PID 139660)",
+      "WebFetch(domain:voximplant.com)",
+      "Bash(docker exec:*)"
+    ]
+  }
+}

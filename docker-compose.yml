@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: halo_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: halo_user
+      POSTGRES_PASSWORD: halo_password
+      POSTGRES_DB: halo_db
+    # No external ports - only accessible within Docker network
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - halo-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U halo_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: halo_backend
+    restart: always
+    ports:
+      - "127.0.0.1:8000:8000"  # Expose only to localhost for nginx proxy
+    env_file:
+      - backend/.env
+    networks:
+      - halo-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '1'
+          memory: 1G
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  halo-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
