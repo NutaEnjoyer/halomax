@@ -82,7 +82,7 @@ function StartCall() {
               id="phone_number"
               name="phone_number"
               type="tel"
-              placeholder="+79019433546"
+              placeholder="+79277654321"
               value={formData.phone_number}
               onChange={handleChange}
               className="glass-input w-full px-5 py-4 rounded-xl text-white font-medium text-lg placeholder:text-white/50"
