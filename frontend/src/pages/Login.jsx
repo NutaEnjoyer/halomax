@@ -20,7 +20,7 @@ function Login() {
       setToken(response.data.access_token);
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.detail || 'Login failed');
+      setError(err.response?.data?.detail || 'Ошибка входа');
     } finally {
       setLoading(false);
     }
@@ -42,13 +42,13 @@ function Login() {
           <h1 className="text-4xl font-bold mb-2">
             <span className="gradient-text">HALO AI</span>
           </h1>
-          <p className="text-gray-600">AI-powered call automation platform</p>
+          <p className="text-gray-600">Платформа автоматизации звонков на базе ИИ</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
             <label htmlFor="username" className="block text-sm font-semibold text-gray-700 mb-2">
-              Username
+              Логин
             </label>
             <input
               id="username"
@@ -56,14 +56,14 @@ function Login() {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               className="glass-input w-full px-4 py-3 rounded-xl text-gray-900 font-medium"
-              placeholder="Enter your username"
+              placeholder="Введите логин"
               required
             />
           </div>
 
           <div>
             <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
-              Password
+              Пароль
             </label>
             <input
               id="password"
@@ -71,7 +71,7 @@ function Login() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="glass-input w-full px-4 py-3 rounded-xl text-gray-900 font-medium"
-              placeholder="Enter your password"
+              placeholder="Введите пароль"
               required
             />
           </div>
@@ -90,17 +90,17 @@ function Login() {
             {loading ? (
               <>
                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                <span>Logging in...</span>
+                <span>Вход...</span>
               </>
             ) : (
-              <span>Login to Dashboard</span>
+              <span>Войти в панель</span>
             )}
           </button>
         </form>
 
         <div className="mt-6 pt-6 border-t border-gray-200">
           <p className="text-center text-sm text-gray-500">
-            <span className="font-medium">Default credentials:</span> admin / admin
+            <span className="font-medium">Тестовые данные для входа:</span> admin / admin
           </p>
         </div>
       </div>

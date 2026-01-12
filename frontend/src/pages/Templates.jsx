@@ -4,9 +4,9 @@ import { useNavigate } from 'react-router-dom';
 const templates = [
   {
     id: 1,
-    name: 'Sales Outreach',
-    description: 'Cold calling for product sales',
-    category: 'Sales',
+    name: 'Продажи (обзвон)',
+    description: 'Холодный обзвон для продаж продукта',
+    category: 'Продажи',
     color: 'from-blue-500 to-indigo-600',
     template: {
       language: 'ru',
@@ -26,9 +26,9 @@ const templates = [
   },
   {
     id: 2,
-    name: 'Customer Survey',
-    description: 'Collect customer feedback',
-    category: 'Research',
+    name: 'Опрос клиентов',
+    description: 'Сбор обратной связи от клиентов',
+    category: 'Исследования',
     color: 'from-green-500 to-emerald-600',
     template: {
       language: 'ru',
@@ -51,9 +51,9 @@ const templates = [
   },
   {
     id: 3,
-    name: 'Appointment Reminder',
-    description: 'Remind about scheduled appointment',
-    category: 'Support',
+    name: 'Напоминание о записи',
+    description: 'Напоминание о запланированной записи',
+    category: 'Поддержка',
     color: 'from-purple-500 to-pink-600',
     template: {
       language: 'ru',
@@ -73,9 +73,9 @@ const templates = [
   },
   {
     id: 4,
-    name: 'Lead Qualification',
-    description: 'Qualify potential leads',
-    category: 'Sales',
+    name: 'Квалификация лида',
+    description: 'Оценка потенциальных клиентов',
+    category: 'Продажи',
     color: 'from-orange-500 to-red-600',
     template: {
       language: 'ru',
@@ -99,9 +99,9 @@ const templates = [
   },
   {
     id: 5,
-    name: 'Customer Support',
-    description: 'Handle customer inquiries',
-    category: 'Support',
+    name: 'Поддержка клиентов',
+    description: 'Обработка обращений клиентов',
+    category: 'Поддержка',
     color: 'from-cyan-500 to-blue-600',
     template: {
       language: 'ru',
@@ -122,9 +122,9 @@ const templates = [
   },
   {
     id: 6,
-    name: 'Event Invitation',
-    description: 'Invite to upcoming event',
-    category: 'Marketing',
+    name: 'Приглашение на мероприятие',
+    description: 'Приглашение на предстоящее событие',
+    category: 'Маркетинг',
     color: 'from-pink-500 to-rose-600',
     template: {
       language: 'ru',
@@ -157,15 +157,13 @@ function Templates() {
   return (
     <div className="min-h-screen py-10 px-4">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
         <div className="glass-card rounded-2xl p-8 mb-10">
-          <h1 className="text-5xl font-bold text-white mb-3">Call Templates</h1>
+          <h1 className="text-5xl font-bold text-white mb-3">Шаблоны звонков</h1>
           <p className="text-white/80 text-lg">
-            Choose a pre-configured template to quickly start a call with optimized settings
+            Выберите готовый шаблон, чтобы быстро запустить звонок с оптимальными настройками
           </p>
         </div>
 
-        {/* Templates by Category */}
         {categories.map(category => (
           <div key={category} className="mb-10">
             <h2 className="text-3xl font-bold text-white mb-6 ml-2">{category}</h2>
@@ -178,17 +176,14 @@ function Templates() {
                     className="glass-card rounded-2xl p-7 hover:scale-105 transition-all duration-300 cursor-pointer group"
                     onClick={() => handleUseTemplate(template)}
                   >
-                    {/* Gradient Header */}
                     <div className={`w-full h-2 rounded-full bg-gradient-to-r ${template.color} mb-6`}></div>
 
-                    {/* Category Badge */}
                     <div className="flex items-start justify-between mb-4">
                       <span className={`px-4 py-1.5 bg-gradient-to-r ${template.color} text-white text-xs font-bold rounded-xl`}>
                         {template.category}
                       </span>
                     </div>
 
-                    {/* Title & Description */}
                     <h3 className="text-2xl font-bold text-white mb-3 group-hover:text-white transition-colors">
                       {template.name}
                     </h3>
@@ -196,24 +191,22 @@ function Templates() {
                       {template.description}
                     </p>
 
-                    {/* Template Details */}
                     <div className="space-y-3 mb-6">
                       <div className="flex items-center">
-                        <span className="text-xs font-bold text-white/60 uppercase tracking-wide mr-3">Voice:</span>
+                        <span className="text-xs font-bold text-white/60 uppercase tracking-wide mr-3">Голос:</span>
                         <span className="text-sm font-semibold text-white capitalize">{template.template.voice}</span>
                       </div>
                       <div className="flex items-center">
-                        <span className="text-xs font-bold text-white/60 uppercase tracking-wide mr-3">Language:</span>
+                        <span className="text-xs font-bold text-white/60 uppercase tracking-wide mr-3">Язык:</span>
                         <span className="text-sm font-semibold text-white uppercase">{template.template.language}</span>
                       </div>
                     </div>
 
-                    {/* Use Button */}
                     <button
                       onClick={() => handleUseTemplate(template)}
                       className="glass-button w-full text-white font-bold py-3 rounded-xl glow-hover transition-smooth"
                     >
-                      Use Template
+                      Использовать шаблон
                     </button>
                   </div>
                 ))}

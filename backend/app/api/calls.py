@@ -285,6 +285,7 @@ async def receive_call_transcript(
 
         call_id = call_data.get("call_id")
         phone = call_data.get("phone")
+        duration = call.data.get("duration_seconds", 0)
         transcript = call_data.get("transcript", [])
         raw_text = call_data.get("raw_text", "")
 
@@ -301,7 +302,9 @@ async def receive_call_transcript(
             print(f"[Webhook] Call not found with call_id: {call_id}")
             return {"status": "error", "message": "Call not found"}
 
+
         # Update call with transcript
+        call.duration = duration
         call.transcript = raw_text
         call.status = CallStatus.ANALYZING
 

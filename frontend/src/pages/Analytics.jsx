@@ -4,18 +4,18 @@ import { callsAPI } from '../services/api';
 import CallDetailsModal from '../components/CallDetailsModal';
 
 const DISPOSITION_LABELS = {
-  interested: 'Interested',
-  rejected: 'Rejected',
-  no_answer: 'No Answer',
-  busy: 'Busy',
-  wrong_number: 'Wrong Number',
-  continue_in_chat: 'Continue in Chat',
+  interested: 'Заинтересован',
+  rejected: 'Отказ',
+  no_answer: 'Нет ответа',
+  busy: 'Занято',
+  wrong_number: 'Неверный номер',
+  continue_in_chat: 'Продолжить в чате',
 };
 
 const CRM_STATUS_LABELS = {
-  added: 'Added to CRM',
-  pending: 'Pending',
-  not_created: 'Not Created',
+  added: 'Добавлено в CRM',
+  pending: 'В ожидании',
+  not_created: 'Не создано',
 };
 
 function Analytics() {
@@ -53,9 +53,10 @@ function Analytics() {
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    return date.toLocaleString('en-US', {
-      month: 'short',
-      day: 'numeric',
+    return date.toLocaleString('ru-RU', {
+      day: '2-digit',
+      month: '2-digit',
+      year: '2-digit',
       hour: '2-digit',
       minute: '2-digit',
     });
@@ -66,7 +67,7 @@ function Analytics() {
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="glass-card rounded-2xl p-12 text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-purple-600 mx-auto mb-6"></div>
-          <p className="text-gray-700 font-medium text-lg">Loading analytics...</p>
+          <p className="text-gray-700 font-medium text-lg">Загружаем аналитику...</p>
         </div>
       </div>
     );
@@ -77,12 +78,12 @@ function Analytics() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-10">
-          <h1 className="text-5xl font-bold text-white">HALO Analytics</h1>
+          <h1 className="text-5xl font-bold text-white">HALO Аналитика</h1>
           <button
             onClick={() => navigate('/')}
             className="glass-button px-8 py-3 text-white font-bold rounded-xl glow-hover transition-smooth"
           >
-            New Call
+            Новый звонок
           </button>
         </div>
 
@@ -90,22 +91,22 @@ function Analytics() {
         {analytics && (
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
             <div className="glass-card rounded-2xl p-7 border-l-4 border-purple-500">
-              <h3 className="text-xs font-bold text-white/70 mb-3 uppercase tracking-wide">Total Calls</h3>
+              <h3 className="text-xs font-bold text-white/70 mb-3 uppercase tracking-wide">Всего звонков</h3>
               <p className="text-5xl font-bold text-white">{analytics.total_calls}</p>
             </div>
 
             <div className="glass-card rounded-2xl p-7 border-l-4 border-green-500">
-              <h3 className="text-xs font-bold text-white/70 mb-3 uppercase tracking-wide">Talk Rate</h3>
+              <h3 className="text-xs font-bold text-white/70 mb-3 uppercase tracking-wide">Доля диалогов</h3>
               <p className="text-5xl font-bold text-green-300">{analytics.talk_rate}%</p>
             </div>
 
             <div className="glass-card rounded-2xl p-7 border-l-4 border-blue-500">
-              <h3 className="text-xs font-bold text-white/70 mb-3 uppercase tracking-wide">Interest Rate</h3>
+              <h3 className="text-xs font-bold text-white/70 mb-3 uppercase tracking-wide">Доля заинтересованных</h3>
               <p className="text-5xl font-bold text-blue-300">{analytics.interest_rate}%</p>
             </div>
 
             <div className="glass-card rounded-2xl p-7 border-l-4 border-orange-500">
-              <h3 className="text-xs font-bold text-white/70 mb-3 uppercase tracking-wide">Avg Duration</h3>
+              <h3 className="text-xs font-bold text-white/70 mb-3 uppercase tracking-wide">Средняя длительность</h3>
               <p className="text-5xl font-bold text-white">{formatDuration(analytics.avg_duration)}</p>
             </div>
           </div>
@@ -114,7 +115,7 @@ function Analytics() {
         {/* Funnel */}
         {analytics?.funnel && (
           <div className="glass-card rounded-2xl p-8 mb-8">
-            <h2 className="text-2xl font-bold text-white mb-6">Conversion Funnel</h2>
+            <h2 className="text-2xl font-bold text-white mb-6">Воронка конверсий</h2>
             <div className="space-y-5">
               {Object.entries(analytics.funnel).map(([stage, count]) => {
                 const percentage = analytics.funnel.called > 0
@@ -143,17 +144,17 @@ function Analytics() {
         {/* Calls Table */}
         <div className="glass-card rounded-2xl overflow-hidden">
           <div className="px-8 py-6 border-b border-white/20">
-            <h2 className="text-2xl font-bold text-white">Call History</h2>
+            <h2 className="text-2xl font-bold text-white">История звонков</h2>
           </div>
 
           {calls.length === 0 ? (
             <div className="text-center py-16 px-4">
-              <p className="text-white/80 text-lg font-medium">No calls yet. Start your first demo call!</p>
+              <p className="text-white/80 text-lg font-medium">Пока нет звонков. Запустите первый демо-звонок!</p>
               <button
                 onClick={() => navigate('/')}
                 className="mt-6 glass-button px-8 py-4 text-white font-bold rounded-xl glow-hover inline-block"
               >
-                Start First Call
+                Первый звонок
               </button>
             </div>
           ) : (
@@ -161,12 +162,12 @@ function Analytics() {
               <table className="w-full">
                 <thead className="glass border-b border-white/20">
                   <tr>
-                    <th className="px-6 py-4 text-left text-xs font-bold text-white/70 uppercase tracking-wider">Phone</th>
-                    <th className="px-6 py-4 text-left text-xs font-bold text-white/70 uppercase tracking-wider">Date/Time</th>
-                    <th className="px-6 py-4 text-left text-xs font-bold text-white/70 uppercase tracking-wider">Duration</th>
-                    <th className="px-6 py-4 text-left text-xs font-bold text-white/70 uppercase tracking-wider">Disposition</th>
-                    <th className="px-6 py-4 text-left text-xs font-bold text-white/70 uppercase tracking-wider">CRM Status</th>
-                    <th className="px-6 py-4 text-left text-xs font-bold text-white/70 uppercase tracking-wider">Actions</th>
+                    <th className="px-6 py-4 text-left text-xs font-bold text-white/70 uppercase tracking-wider">Телефон</th>
+                    <th className="px-6 py-4 text-left text-xs font-bold text-white/70 uppercase tracking-wider">Дата/время</th>
+                    <th className="px-6 py-4 text-left text-xs font-bold text-white/70 uppercase tracking-wider">Длительность</th>
+                    <th className="px-6 py-4 text-left text-xs font-bold text-white/70 uppercase tracking-wider">Результат</th>
+                    <th className="px-6 py-4 text-left text-xs font-bold text-white/70 uppercase tracking-wider">Статус CRM</th>
+                    <th className="px-6 py-4 text-left text-xs font-bold text-white/70 uppercase tracking-wider">Действия</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/10">
@@ -198,7 +199,7 @@ function Analytics() {
                           onClick={() => setSelectedCall(call)}
                           className="text-purple-300 hover:text-purple-100 text-sm font-bold hover:underline"
                         >
-                          View Details
+                          Подробнее
                         </button>
                       </td>
                     </tr>

@@ -11,9 +11,9 @@ function Navigation() {
   };
 
   const navItems = [
-    { name: 'Start Demo', path: '/start-call' },
-    { name: 'Templates', path: '/templates' },
-    { name: 'Analytics', path: '/analytics' },
+    { name: 'Запуск звонка', path: '/start-call' },
+    { name: 'Шаблоны', path: '/templates' },
+    { name: 'Аналитика', path: '/analytics' },
   ];
 
   const isActive = (path) => {
@@ -63,7 +63,7 @@ function Navigation() {
             onClick={handleLogout}
             className="px-6 py-2.5 rounded-xl font-medium text-white/80 hover:text-white hover:bg-white/10 transition-all duration-300"
           >
-            Logout
+            Выйти
           </button>
         </div>
       </div>

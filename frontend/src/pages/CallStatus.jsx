@@ -3,14 +3,14 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { callsAPI } from '../services/api';
 
 const STATUS_MESSAGES = {
-  initiating: 'Initializing call...',
-  calling: 'Calling customer...',
-  analyzing: 'Analyzing conversation...',
-  preparing_followup: 'Preparing follow-up...',
-  sending_sms: 'Sending SMS...',
-  adding_to_crm: 'Adding to CRM...',
-  completed: 'Completed!',
-  failed: 'Call failed',
+  initiating: 'Инициализация звонка...',
+  calling: 'Звоним клиенту...',
+  analyzing: 'Анализируем разговор...',
+  preparing_followup: 'Готовим последующее сообщение...',
+  sending_sms: 'Отправляем SMS...',
+  adding_to_crm: 'Добавляем в CRM...',
+  completed: 'Готово!',
+  failed: 'Звонок не удался',
 };
 
 function CallStatus() {
@@ -36,7 +36,7 @@ function CallStatus() {
           }
         }
       } catch (err) {
-        setError(err.response?.data?.detail || 'Failed to fetch call status');
+        setError(err.response?.data?.detail || 'Не удалось получить статус звонка');
         setLoading(false);
         if (pollInterval) {
           clearInterval(pollInterval);
@@ -62,7 +62,7 @@ function CallStatus() {
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="glass-card rounded-2xl p-12 text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-purple-600 mx-auto mb-6"></div>
-          <p className="text-gray-700 font-medium text-lg">Loading call status...</p>
+          <p className="text-gray-700 font-medium text-lg">Загружаем статус звонка...</p>
         </div>
       </div>
     );
@@ -73,13 +73,13 @@ function CallStatus() {
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="glass-card rounded-2xl p-10 max-w-md w-full">
           <div className="glass-dark rounded-xl px-6 py-4 mb-6 border border-red-400/50">
-            <p className="text-red-200 font-bold">Error: {error}</p>
+            <p className="text-red-200 font-bold">Ошибка: {error}</p>
           </div>
           <button
             onClick={() => navigate('/')}
             className="glass-button w-full text-white font-bold py-4 rounded-xl glow-hover"
           >
-            Back to Home
+            На главную
           </button>
         </div>
       </div>
@@ -93,7 +93,7 @@ function CallStatus() {
     <div className="min-h-screen py-12 px-4">
       <div className="max-w-3xl mx-auto">
         <div className="glass-card rounded-3xl p-10">
-          <h1 className="text-4xl font-bold text-white mb-10">Call Progress</h1>
+          <h1 className="text-4xl font-bold text-white mb-10">Ход звонка</h1>
 
           {/* Status Steps */}
           <div className="space-y-5 mb-10">
@@ -134,7 +134,7 @@ function CallStatus() {
 
           {isFailed && (
             <div className="glass-dark rounded-2xl px-6 py-5 mb-8 border border-red-400/50">
-              <p className="text-red-200 font-bold text-lg">Call failed. Please try again.</p>
+              <p className="text-red-200 font-bold text-lg">Звонок не удался. Попробуйте ещё раз.</p>
             </div>
           )}
 
@@ -145,13 +145,13 @@ function CallStatus() {
                 onClick={() => navigate('/analytics')}
                 className="glass-button w-full text-white font-bold py-5 rounded-2xl text-lg glow-hover transition-smooth"
               >
-                View Analytics
+                Открыть аналитику
               </button>
               <button
                 onClick={() => navigate('/start-call')}
                 className="w-full glass-card hover:bg-white/30 text-white font-bold py-5 rounded-2xl text-lg transition-smooth"
               >
-                Start Another Call
+                Запустить ещё звонок
               </button>
             </div>
           )}
@@ -160,7 +160,7 @@ function CallStatus() {
             <div className="text-center">
               <div className="inline-block glass-card px-8 py-5 rounded-2xl">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-purple-300 mx-auto mb-4"></div>
-                <p className="text-white font-medium text-lg">Processing...</p>
+                <p className="text-white font-medium text-lg">Обрабатываем...</p>
               </div>
             </div>
           )}
