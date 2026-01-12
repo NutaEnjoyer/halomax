@@ -8,7 +8,20 @@ function StartCall() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [playingVoice, setPlayingVoice] = useState(null);
+  const [voiceDropdownOpen, setVoiceDropdownOpen] = useState(false);
   const audioRef = useRef(null);
+  const voiceDropdownRef = useRef(null);
+
+  const voices = [
+    { value: 'alloy', label: 'Alloy', description: 'нейтральный, сбалансированный' },
+    { value: 'ash', label: 'Ash', description: 'чёткий, разборчивый' },
+    { value: 'ballad', label: 'Ballad', description: 'мягкий, спокойный' },
+    { value: 'coral', label: 'Coral', description: 'тёплый, дружелюбный' },
+    { value: 'echo', label: 'Echo', description: 'глубокий, насыщенный' },
+    { value: 'sage', label: 'Sage', description: 'спокойный, уверенный' },
+    { value: 'shimmer', label: 'Shimmer', description: 'яркий, энергичный' },
+    { value: 'verse', label: 'Verse', description: 'выразительный, динамичный' },
+  ];
 
   // Get template data from navigation state
   const templateData = location.state?.template;
@@ -46,6 +59,20 @@ function StartCall() {
     };
   }, []);
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (voiceDropdownRef.current && !voiceDropdownRef.current.contains(event.target)) {
+        setVoiceDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -53,7 +80,9 @@ function StartCall() {
     });
   };
 
-  const handlePlayVoice = (voiceName) => {
+  const handlePlayVoice = (voiceName, e) => {
+    e?.stopPropagation(); // Prevent dropdown from closing when clicking play button
+    
     // Stop any currently playing audio
     if (audioRef.current) {
       audioRef.current.pause();
@@ -84,6 +113,14 @@ function StartCall() {
       console.error('Audio playback error');
       setPlayingVoice(null);
     };
+  };
+
+  const handleVoiceSelect = (voiceValue) => {
+    setFormData({
+      ...formData,
+      voice: voiceValue,
+    });
+    setVoiceDropdownOpen(false);
   };
 
   const handleSubmit = async (e) => {
@@ -154,47 +191,66 @@ function StartCall() {
             </div>
 
             <div className="glass-card rounded-2xl p-6">
-              <label htmlFor="voice" className="block text-sm font-bold text-white/80 mb-3 uppercase tracking-wide">
+              <label className="block text-sm font-bold text-white/80 mb-3 uppercase tracking-wide">
                 Голосовая модель
               </label>
-              <div className="flex gap-3">
-                <select
-                  id="voice"
-                  name="voice"
-                  value={formData.voice}
-                  onChange={handleChange}
-                  className="glass-input flex-1 px-5 py-4 rounded-xl text-white font-medium"
-                  required
-                >
-                  <option value="alloy">Alloy (нейтральный, сбалансированный)</option>
-                  <option value="ash">Ash (чёткий, разборчивый)</option>
-                  <option value="ballad">Ballad (мягкий, спокойный)</option>
-                  <option value="coral">Coral (тёплый, дружелюбный)</option>
-                  <option value="echo">Echo (глубокий, насыщенный)</option>
-                  <option value="sage">Sage (спокойный, уверенный)</option>
-                  <option value="shimmer">Shimmer (яркий, энергичный)</option>
-                  <option value="verse">Verse (выразительный, динамичный)</option>
-                </select>
+              <div className="relative" ref={voiceDropdownRef}>
                 <button
                   type="button"
-                  onClick={() => handlePlayVoice(formData.voice)}
-                  className={`px-4 py-4 rounded-xl font-medium transition-all duration-300 flex items-center justify-center min-w-[56px] ${
-                    playingVoice === formData.voice
-                      ? 'bg-purple-500 text-white animate-pulse'
-                      : 'glass-button text-white hover:bg-purple-500/80'
-                  }`}
-                  title={playingVoice === formData.voice ? 'Остановить' : 'Прослушать голос'}
+                  onClick={() => setVoiceDropdownOpen(!voiceDropdownOpen)}
+                  className="glass-input w-full px-5 py-4 rounded-xl text-white font-medium text-left flex items-center justify-between hover:bg-purple-500/20 transition-colors"
                 >
-                  {playingVoice === formData.voice ? (
-                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
-                    </svg>
-                  ) : (
-                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
-                    </svg>
-                  )}
+                  <span>
+                    {voices.find(v => v.value === formData.voice)?.label} ({voices.find(v => v.value === formData.voice)?.description})
+                  </span>
+                  <svg 
+                    className={`w-5 h-5 transition-transform ${voiceDropdownOpen ? 'rotate-180' : ''}`} 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
                 </button>
+                
+                {voiceDropdownOpen && (
+                  <div className="absolute z-50 w-full mt-2 glass-card rounded-xl overflow-hidden shadow-2xl max-h-96 overflow-y-auto">
+                    {voices.map((voice) => (
+                      <div
+                        key={voice.value}
+                        className={`flex items-center justify-between px-5 py-4 hover:bg-white/10 transition-colors cursor-pointer ${
+                          formData.voice === voice.value ? 'bg-purple-500/30' : ''
+                        }`}
+                        onClick={() => handleVoiceSelect(voice.value)}
+                      >
+                        <div className="flex-1">
+                          <div className="font-semibold text-white">{voice.label}</div>
+                          <div className="text-sm text-white/70">{voice.description}</div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={(e) => handlePlayVoice(voice.value, e)}
+                          className={`ml-3 p-2 rounded-lg transition-all duration-300 flex items-center justify-center ${
+                            playingVoice === voice.value
+                              ? 'bg-purple-500 text-white animate-pulse'
+                              : 'bg-white/10 text-white hover:bg-purple-500/80'
+                          }`}
+                          title={playingVoice === voice.value ? 'Остановить' : 'Прослушать'}
+                        >
+                          {playingVoice === voice.value ? (
+                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                            </svg>
+                          ) : (
+                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+                            </svg>
+                          )}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
               <p className="text-xs text-white/60 mt-2">
                 Все голоса поддерживают несколько языков. Нажмите кнопку проигрывания, чтобы прослушать голос
