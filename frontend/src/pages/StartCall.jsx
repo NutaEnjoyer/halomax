@@ -9,10 +9,8 @@ function StartCall() {
   const [error, setError] = useState('');
   const [playingVoice, setPlayingVoice] = useState(null);
   const [voiceDropdownOpen, setVoiceDropdownOpen] = useState(false);
-  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
   const audioRef = useRef(null);
   const voiceDropdownRef = useRef(null);
-  const voiceButtonRef = useRef(null);
 
   const voices = [
     { value: 'alloy', label: 'Alloy', description: 'нейтральный, сбалансированный' },
@@ -61,28 +59,10 @@ function StartCall() {
     };
   }, []);
 
-  // Calculate dropdown position and close when clicking outside
+  // Close dropdown when clicking outside
   useEffect(() => {
-    const updateDropdownPosition = () => {
-      if (voiceButtonRef.current && voiceDropdownOpen) {
-        const rect = voiceButtonRef.current.getBoundingClientRect();
-        setDropdownPosition({
-          top: rect.bottom + window.scrollY + 8,
-          left: rect.left + window.scrollX,
-          width: rect.width,
-        });
-      }
-    };
-
-    if (voiceDropdownOpen) {
-      updateDropdownPosition();
-      window.addEventListener('scroll', updateDropdownPosition, true);
-      window.addEventListener('resize', updateDropdownPosition);
-    }
-
     const handleClickOutside = (event) => {
-      if (voiceDropdownRef.current && !voiceDropdownRef.current.contains(event.target) &&
-          voiceButtonRef.current && !voiceButtonRef.current.contains(event.target)) {
+      if (voiceDropdownRef.current && !voiceDropdownRef.current.contains(event.target)) {
         setVoiceDropdownOpen(false);
       }
     };
@@ -92,8 +72,6 @@ function StartCall() {
     }
 
     return () => {
-      window.removeEventListener('scroll', updateDropdownPosition, true);
-      window.removeEventListener('resize', updateDropdownPosition);
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [voiceDropdownOpen]);
@@ -215,13 +193,12 @@ function StartCall() {
               </select>
             </div>
 
-            <div className="glass-card rounded-2xl p-6 relative">
+            <div className="glass-card rounded-2xl p-6 relative" style={{ zIndex: voiceDropdownOpen ? 50 : 1 }}>
               <label className="block text-sm font-bold text-white/80 mb-3 uppercase tracking-wide">
                 Голосовая модель
               </label>
-              <div className="relative">
+              <div className="relative" ref={voiceDropdownRef}>
                 <button
-                  ref={voiceButtonRef}
                   type="button"
                   onClick={() => setVoiceDropdownOpen(!voiceDropdownOpen)}
                   className="glass-input w-full px-5 py-4 rounded-xl text-white font-medium text-left flex items-center justify-between hover:bg-purple-500/20 transition-colors"
@@ -238,18 +215,9 @@ function StartCall() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </button>
-              </div>
-              {voiceDropdownOpen && (
-                <div 
-                  ref={voiceDropdownRef}
-                  className="fixed glass-card rounded-xl overflow-hidden shadow-2xl max-h-96 overflow-y-auto" 
-                  style={{ 
-                    zIndex: 9999,
-                    top: `${dropdownPosition.top}px`,
-                    left: `${dropdownPosition.left}px`,
-                    width: `${dropdownPosition.width}px`
-                  }}
-                >
+                
+                {voiceDropdownOpen && (
+                  <div className="absolute z-[100] w-full mt-2 glass-card rounded-xl overflow-hidden shadow-2xl max-h-96 overflow-y-auto">
                     {voices.map((voice) => (
                       <div
                         key={voice.value}
