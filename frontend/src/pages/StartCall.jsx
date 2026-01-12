@@ -252,8 +252,9 @@ function StartCall() {
                         </button>
                       </div>
                     ))}
-                </div>
-              )}
+                  </div>
+                )}
+              </div>
               <p className="text-xs text-white/60 mt-2">
                 Все голоса поддерживают несколько языков. Нажмите кнопку проигрывания, чтобы прослушать голос
               </p>
