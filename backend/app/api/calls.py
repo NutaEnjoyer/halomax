@@ -285,7 +285,7 @@ async def receive_call_transcript(
 
         call_id = call_data.get("call_id")
         phone = call_data.get("phone")
-        duration = call.data.get("duration_seconds", 0)
+        duration = call_data.get("duration_seconds", 0)
         transcript = call_data.get("transcript", [])
         raw_text = call_data.get("raw_text", "")
 
