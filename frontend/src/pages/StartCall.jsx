@@ -12,15 +12,49 @@ function StartCall() {
   const audioRef = useRef(null);
   const voiceDropdownRef = useRef(null);
 
+  // ElevenLabs voices
+  // label - отображаемое название
+  // voiceId - ID голоса в ElevenLabs
+  // description - описание голоса
+  // mp3 - название файла в /public/voices/ (без расширения)
   const voices = [
-    { value: 'alloy', label: 'Alloy', description: 'нейтральный, сбалансированный' },
-    { value: 'ash', label: 'Ash', description: 'чёткий, разборчивый' },
-    { value: 'ballad', label: 'Ballad', description: 'мягкий, спокойный' },
-    { value: 'coral', label: 'Coral', description: 'тёплый, дружелюбный' },
-    { value: 'echo', label: 'Echo', description: 'глубокий, насыщенный' },
-    { value: 'sage', label: 'Sage', description: 'спокойный, уверенный' },
-    { value: 'shimmer', label: 'Shimmer', description: 'яркий, энергичный' },
-    { value: 'verse', label: 'Verse', description: 'выразительный, динамичный' },
+    {
+      label: 'Nikolay',
+      voiceId: '3EuKHIEZbSzrHGNmdYsx',
+      description: 'Confident and Clear',
+      mp3: 'Nikolay'
+    },
+    {
+      label: 'Denis',
+      voiceId: '0BcDz9UPwL3MpsnTeUlO',
+      description: 'Pleasant, Engagind and Friendly',
+      mp3: 'Denis'
+    },
+    {
+      label: 'Marina',
+      voiceId: 'ymDCYd8puC7gYjxIamPt',
+      description: 'Soft, Clear and Warm',
+      mp3: 'Marina'
+    },
+    {
+      label: 'Kari',
+      voiceId: 'Jbte7ht1CqapnZvc4KpK',
+      description: 'Warm, Engagind and Friendly',
+      mp3: 'Kari'
+    },
+    {
+      label: 'Maria',
+      voiceId: 'EDpEYNf6XIeKYRzYcx4I',
+      description: 'Measured, Calm and Engagind',
+      mp3: 'Maria'
+    },
+    {
+      label: 'Maxim',
+      voiceId: 'HcaxAsrhw4ByUo4CBCBN',
+      description: 'Calm & Neutral',
+      mp3: 'Maxim'
+    },
+    // Добавьте больше голосов по этому шаблону
   ];
 
   // Get template data from navigation state
@@ -29,7 +63,7 @@ function StartCall() {
   const [formData, setFormData] = useState({
     phone_number: '',
     language: templateData?.language || 'ru',
-    voice: templateData?.voice || 'alloy',
+    voice: templateData?.voice || voices[0]?.voiceId || '',
     greeting_message: templateData?.greeting_message || '',
     prompt: templateData?.prompt || '',
     funnel_goal: templateData?.funnel_goal || '',
@@ -41,7 +75,7 @@ function StartCall() {
       setFormData({
         phone_number: '',
         language: templateData.language || 'ru',
-        voice: templateData.voice || 'alloy',
+        voice: templateData.voice || voices[0]?.voiceId || '',
         greeting_message: templateData.greeting_message || '',
         prompt: templateData.prompt || '',
         funnel_goal: templateData.funnel_goal || '',
@@ -83,9 +117,9 @@ function StartCall() {
     });
   };
 
-  const handlePlayVoice = (voiceName, e) => {
+  const handlePlayVoice = (voiceId, e) => {
     e?.stopPropagation(); // Prevent dropdown from closing when clicking play button
-    
+
     // Stop any currently playing audio
     if (audioRef.current) {
       audioRef.current.pause();
@@ -93,15 +127,18 @@ function StartCall() {
     }
 
     // If clicking the same voice that's playing, stop it
-    if (playingVoice === voiceName) {
+    if (playingVoice === voiceId) {
       setPlayingVoice(null);
       return;
     }
 
-    // Play the selected voice
-    const audio = new Audio(`/voices/${voiceName}.mp3`);
+    // Find voice and play its mp3
+    const voice = voices.find(v => v.voiceId === voiceId);
+    if (!voice) return;
+
+    const audio = new Audio(`/voices/${voice.mp3}.mp3`);
     audioRef.current = audio;
-    setPlayingVoice(voiceName);
+    setPlayingVoice(voiceId);
 
     audio.play().catch((err) => {
       console.error('Failed to play audio:', err);
@@ -204,7 +241,7 @@ function StartCall() {
                   className="glass-input w-full px-5 py-4 rounded-xl text-white font-medium text-left flex items-center justify-between hover:bg-purple-500/20 transition-colors"
                 >
                   <span>
-                    {voices.find(v => v.value === formData.voice)?.label} ({voices.find(v => v.value === formData.voice)?.description})
+                    {voices.find(v => v.voiceId === formData.voice)?.label} ({voices.find(v => v.voiceId === formData.voice)?.description})
                   </span>
                   <svg 
                     className={`w-5 h-5 transition-transform ${voiceDropdownOpen ? 'rotate-180' : ''}`} 
@@ -220,11 +257,11 @@ function StartCall() {
                   <div className="absolute z-[100] w-full mt-2 glass-card rounded-xl overflow-hidden shadow-2xl max-h-96 overflow-y-auto">
                     {voices.map((voice) => (
                       <div
-                        key={voice.value}
+                        key={voice.voiceId}
                         className={`flex items-center justify-between px-5 py-4 hover:bg-white/10 transition-colors cursor-pointer ${
-                          formData.voice === voice.value ? 'bg-purple-500/30' : ''
+                          formData.voice === voice.voiceId ? 'bg-purple-500/30' : ''
                         }`}
-                        onClick={() => handleVoiceSelect(voice.value)}
+                        onClick={() => handleVoiceSelect(voice.voiceId)}
                       >
                         <div className="flex-1">
                           <div className="font-semibold text-white">{voice.label}</div>
@@ -232,15 +269,15 @@ function StartCall() {
                         </div>
                         <button
                           type="button"
-                          onClick={(e) => handlePlayVoice(voice.value, e)}
+                          onClick={(e) => handlePlayVoice(voice.voiceId, e)}
                           className={`ml-3 p-2 rounded-lg transition-all duration-300 flex items-center justify-center ${
-                            playingVoice === voice.value
+                            playingVoice === voice.voiceId
                               ? 'bg-purple-500 text-white animate-pulse'
                               : 'bg-white/10 text-white hover:bg-purple-500/80'
                           }`}
-                          title={playingVoice === voice.value ? 'Остановить' : 'Прослушать'}
+                          title={playingVoice === voice.voiceId ? 'Остановить' : 'Прослушать'}
                         >
-                          {playingVoice === voice.value ? (
+                          {playingVoice === voice.voiceId ? (
                             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                               <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
                             </svg>

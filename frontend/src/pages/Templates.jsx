@@ -10,7 +10,7 @@ const templates = [
     color: 'from-blue-500 to-indigo-600',
     template: {
       language: 'ru',
-      voice: 'coral',
+      voice: '0BcDz9UPwL3MpsnTeUlO',  // Denis
       greeting_message: 'Здравствуйте! Меня зовут HALO, я звоню от компании по продаже инновационных решений.',
       funnel_goal: 'Получить контактные данные клиента и договориться о встрече',
       prompt: `Ты - профессиональный менеджер по продажам. Твоя задача:
@@ -32,7 +32,7 @@ const templates = [
     color: 'from-green-500 to-emerald-600',
     template: {
       language: 'ru',
-      voice: 'shimmer',
+      voice: 'ymDCYd8puC7gYjxIamPt',  // Marina
       greeting_message: 'Добрый день! Я провожу короткий опрос для улучшения качества обслуживания.',
       funnel_goal: 'Получить ответы на все вопросы опроса и завершить анкетирование',
       prompt: `Ты - вежливый интервьюер, проводящий опрос клиентов. Твоя задача:
@@ -57,7 +57,7 @@ const templates = [
     color: 'from-purple-500 to-pink-600',
     template: {
       language: 'ru',
-      voice: 'alloy',
+      voice: 'Jbte7ht1CqapnZvc4KpK',  // Kari
       greeting_message: 'Здравствуйте! Это напоминание о вашей записи.',
       funnel_goal: 'Подтвердить запись или перенести на другое время',
       prompt: `Ты - администратор, звонишь клиенту с напоминанием о записи. Твоя задача:
@@ -79,7 +79,7 @@ const templates = [
     color: 'from-orange-500 to-red-600',
     template: {
       language: 'ru',
-      voice: 'echo',
+      voice: '3EuKHIEZbSzrHGNmdYsx',  // Nikolay
       greeting_message: 'Добрый день! Я HALO, специалист по работе с клиентами.',
       funnel_goal: 'Определить уровень заинтересованности и квалифицировать лида',
       prompt: `Ты - специалист по квалификации лидов. Твоя задача определить потенциал клиента:
@@ -105,7 +105,7 @@ const templates = [
     color: 'from-cyan-500 to-blue-600',
     template: {
       language: 'ru',
-      voice: 'ballad',
+      voice: 'EDpEYNf6XIeKYRzYcx4I',  // Maria
       greeting_message: 'Здравствуйте! Служба поддержки клиентов. Чем могу помочь?',
       funnel_goal: 'Решить проблему клиента или перенаправить на специалиста',
       prompt: `Ты - сотрудник службы поддержки. Твоя задача помочь клиенту:
@@ -128,7 +128,7 @@ const templates = [
     color: 'from-pink-500 to-rose-600',
     template: {
       language: 'ru',
-      voice: 'shimmer',
+      voice: 'HcaxAsrhw4ByUo4CBCBN',  // Maxim
       greeting_message: 'Добрый день! Хочу пригласить вас на интересное мероприятие.',
       funnel_goal: 'Получить подтверждение участия в мероприятии',
       prompt: `Ты - организатор мероприятия, приглашаешь клиента. Твоя задача:
