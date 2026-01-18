@@ -15,6 +15,8 @@ class VoximplantService:
         self.caller_id = settings.VOXIMPLANT_CALLER_ID
         self.webook_url = settings.WEBHOOK_URL
         self.openai_api_key = settings.OPENAI_API_KEY
+        self.elevenlabs_api_key = settings.ELEVENLABS_API_KEY
+        self.elevenlabs_agent_id = settings.ELEVENLABS_AGENT_ID
 
     # Temporary storage for call data (in production use database)
     _call_data_store = {}
@@ -46,7 +48,9 @@ class VoximplantService:
             "greeting_message": greeting_message,
             "prompt": prompt,
             "funnel_goal": funnel_goal,
-            "openai_api_key": self.openai_api_key
+            "openai_api_key": self.openai_api_key,
+            "elevenlabs_api_key": self.elevenlabs_api_key,
+            "elevenlabs_agent_id": self.elevenlabs_agent_id
         }
 
         print(f"[Voximplant] Starting call to {phone_number}")

@@ -211,9 +211,3 @@ code {
   background: rgba(102, 126, 234, 0.3);
   color: #fff;
 }
-
-.shimmer,
-.shimmer::after {
-  display: none !important;
-  animation: none !important;
-}

@@ -22,6 +22,10 @@ class Settings(BaseSettings):
     VOXIMPLANT_SCENARIO_ID: str
     VOXIMPLANT_CALLER_ID: str
 
+    # ElevenLabs
+    ELEVENLABS_API_KEY: str
+    ELEVENLABS_AGENT_ID: str
+
     # Webhook
     WEBHOOK_URL: str
 

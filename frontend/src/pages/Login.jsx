@@ -32,7 +32,7 @@ function Login() {
       <div className="absolute top-20 left-20 w-72 h-72 bg-purple-500/30 rounded-full blur-3xl float" />
       <div className="absolute bottom-20 right-20 w-96 h-96 bg-pink-500/30 rounded-full blur-3xl float" style={{ animationDelay: '-3s' }} />
 
-      <div className="glass-card rounded-2xl p-10 w-full max-w-md relative z-10">
+      <div className="glass-card rounded-2xl p-10 w-full max-w-md relative z-10 shimmer">
         <div className="text-center mb-8">
           <div className="inline-block mb-4">
             <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-2xl glow">
