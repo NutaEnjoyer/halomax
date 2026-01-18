@@ -58,14 +58,46 @@ function CallDetailsModal({ call: initialCall, onClose }) {
       "📩 Отправлено клиенту в Telegram\n" +
       "⏱ Через 12 секунд после окончания звонка\n\n" +
       "HALO → Клиенту:\n" +
-      "--------------------------------\n" +
+      "\n" +
       followUpMessage + "\n" +
       "--------------------------------"
     );
   };
 
-  // No parsing needed - just show raw transcript
+  // Parse transcript from format {"msg1","msg2",...} to array
+  const parseTranscript = (transcript) => {
+    if (!transcript) return [];
+    try {
+      // Remove curly braces and split by ","
+      const cleaned = transcript.trim().slice(1, -1); // Remove { and }
+      const messages = [];
+      let current = '';
+      let inQuotes = false;
+
+      for (let i = 0; i < cleaned.length; i++) {
+        const char = cleaned[i];
+        if (char === '"' && cleaned[i - 1] !== '\\') {
+          inQuotes = !inQuotes;
+        } else if (char === ',' && !inQuotes) {
+          if (current.trim()) {
+            messages.push(current.trim());
+          }
+          current = '';
+        } else {
+          current += char;
+        }
+      }
+      if (current.trim()) {
+        messages.push(current.trim());
+      }
+      return messages;
+    } catch (e) {
+      return [transcript];
+    }
+  };
+
   const hasTranscript = call?.transcript && call.transcript.trim().length > 0;
+  const transcriptMessages = hasTranscript ? parseTranscript(call.transcript) : [];
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">
@@ -176,13 +208,36 @@ function CallDetailsModal({ call: initialCall, onClose }) {
             )}
 
             {/* Transcript */}
-            {hasTranscript && (
+            {hasTranscript && transcriptMessages.length > 0 && (
               <div className="glass-card rounded-xl p-6 border-l-4 border-indigo-500">
                 <h3 className="font-bold text-white mb-4 text-lg">Транскрипция разговора</h3>
-                <div className="bg-white/10 rounded-xl p-5">
-                  <pre className="whitespace-pre-wrap font-sans text-sm text-white/90 leading-relaxed">
-                    {call.transcript}
-                  </pre>
+                <div className="space-y-3">
+                  {transcriptMessages.map((message, index) => {
+                    const isAgent = message.startsWith('Агент:');
+                    const text = message.replace(/^(Агент:|Пользователь:)\s*/, '');
+
+                    return (
+                      <div
+                        key={index}
+                        className={`flex ${isAgent ? 'justify-start' : 'justify-end'}`}
+                      >
+                        <div
+                          className={`max-w-[80%] rounded-2xl px-4 py-3 ${
+                            isAgent
+                              ? 'bg-purple-500/30 rounded-tl-sm'
+                              : 'bg-blue-500/30 rounded-tr-sm'
+                          }`}
+                        >
+                          <p className={`text-xs font-bold mb-1 ${
+                            isAgent ? 'text-purple-300' : 'text-blue-300'
+                          }`}>
+                            {isAgent ? 'HALO' : 'Клиент'}
+                          </p>
+                          <p className="text-white/90 text-sm leading-relaxed">{text}</p>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}
