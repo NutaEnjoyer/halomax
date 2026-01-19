@@ -43,3 +43,5 @@ class InboundConfigForVoximplant(BaseModel):
     greeting_message: str
     prompt: str
     funnel_goal: str
+    elevenlabs_api_key: str
+    elevenlabs_agent_id: str
