@@ -11,7 +11,8 @@ function Navigation() {
   };
 
   const navItems = [
-    { name: 'Запуск звонка', path: '/start-call' },
+    { name: 'Исходящие', path: '/start-call' },
+    { name: 'Входящие', path: '/inbound-settings' },
     { name: 'Шаблоны', path: '/templates' },
     { name: 'Аналитика', path: '/analytics' },
   ];

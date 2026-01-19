@@ -7,6 +7,7 @@ import Templates from './pages/Templates';
 import StartCall from './pages/StartCall';
 import CallStatus from './pages/CallStatus';
 import Analytics from './pages/Analytics';
+import InboundSettings from './pages/InboundSettings';
 
 function PrivateRoute({ children }) {
   return isAuthenticated() ? (
@@ -61,6 +62,14 @@ function App() {
           element={
             <PrivateRoute>
               <Analytics />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/inbound-settings"
+          element={
+            <PrivateRoute>
+              <InboundSettings />
             </PrivateRoute>
           }
         />

@@ -1,22 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { callsAPI } from '../services/api';
+import { inboundAPI } from '../services/api';
 
-function StartCall() {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const [loading, setLoading] = useState(false);
+function InboundSettings() {
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [playingVoice, setPlayingVoice] = useState(null);
   const [voiceDropdownOpen, setVoiceDropdownOpen] = useState(false);
   const audioRef = useRef(null);
   const voiceDropdownRef = useRef(null);
 
   // ElevenLabs voices
-  // label - отображаемое название
-  // voiceId - ID голоса в ElevenLabs
-  // description - описание голоса
-  // mp3 - название файла в /public/voices/ (без расширения)
   const voices = [
     {
       label: 'Николай',
@@ -30,57 +25,40 @@ function StartCall() {
       description: 'Мягкий и тёплый',
       mp3: 'Marina'
     }
-    // {
-    //   label: 'Денис',
-    //   voiceId: '0BcDz9UPwL3MpsnTeUlO',
-    //   description: 'Приятный и дружелюбный',
-    //   mp3: 'Denis'
-    // },
-    // {
-    //   label: 'Кари',
-    //   voiceId: 'Jbte7ht1CqapnZvc4KpK',
-    //   description: 'Тёплый и дружелюбный',
-    //   mp3: 'Kari'
-    // },
-    // {
-    //   label: 'Мария',
-    //   voiceId: 'EDpEYNf6XIeKYRzYcx4I',
-    //   description: 'Спокойный и размеренный',
-    //   mp3: 'Maria'
-    // },
-    // {
-    //   label: 'Максим',
-    //   voiceId: 'HcaxAsrhw4ByUo4CBCBN',
-    //   description: 'Спокойный и нейтральный',
-    //   mp3: 'Maxim'
-    // }
   ];
 
-  // Get template data from navigation state
-  const templateData = location.state?.template;
-
   const [formData, setFormData] = useState({
-    phone_number: '',
-    language: templateData?.language || 'ru',
-    voice: templateData?.voice || voices[0]?.voiceId || '',
-    greeting_message: templateData?.greeting_message || '',
-    prompt: templateData?.prompt || '',
-    funnel_goal: templateData?.funnel_goal || '',
+    language: 'ru',
+    voice: voices[0]?.voiceId || '',
+    greeting_message: '',
+    prompt: '',
+    funnel_goal: '',
+    is_active: true,
   });
 
-  // Update form when template changes
+  // Загрузка конфига при монтировании
   useEffect(() => {
-    if (templateData) {
+    fetchConfig();
+  }, []);
+
+  const fetchConfig = async () => {
+    try {
+      const response = await inboundAPI.getConfig();
       setFormData({
-        phone_number: '',
-        language: templateData.language || 'ru',
-        voice: templateData.voice || voices[0]?.voiceId || '',
-        greeting_message: templateData.greeting_message || '',
-        prompt: templateData.prompt || '',
-        funnel_goal: templateData.funnel_goal || '',
+        language: response.data.language || 'ru',
+        voice: response.data.voice || voices[0]?.voiceId || '',
+        greeting_message: response.data.greeting_message || '',
+        prompt: response.data.prompt || '',
+        funnel_goal: response.data.funnel_goal || '',
+        is_active: response.data.is_active ?? true,
       });
+    } catch (err) {
+      console.error('Failed to fetch config:', err);
+      setError('Не удалось загрузить настройки');
+    } finally {
+      setLoading(false);
     }
-  }, [templateData]);
+  };
 
   // Cleanup audio on unmount
   useEffect(() => {
@@ -110,28 +88,26 @@ function StartCall() {
   }, [voiceDropdownOpen]);
 
   const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: type === 'checkbox' ? checked : value,
     });
   };
 
   const handlePlayVoice = (voiceId, e) => {
-    e?.stopPropagation(); // Prevent dropdown from closing when clicking play button
+    e?.stopPropagation();
 
-    // Stop any currently playing audio
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
     }
 
-    // If clicking the same voice that's playing, stop it
     if (playingVoice === voiceId) {
       setPlayingVoice(null);
       return;
     }
 
-    // Find voice and play its mp3
     const voice = voices.find(v => v.voiceId === voiceId);
     if (!voice) return;
 
@@ -154,10 +130,10 @@ function StartCall() {
     };
   };
 
-  const handleVoiceSelect = (voiceValue) => {
+  const handleVoiceSelect = (voiceId) => {
     setFormData({
       ...formData,
-      voice: voiceValue,
+      voice: voiceId,
     });
     setVoiceDropdownOpen(false);
   };
@@ -165,48 +141,63 @@ function StartCall() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    setLoading(true);
+    setSuccess('');
+    setSaving(true);
 
     try {
-      const response = await callsAPI.createCall(formData);
-      navigate(`/call-status/${response.data.id}`);
+      await inboundAPI.updateConfig(formData);
+      setSuccess('Настройки успешно сохранены');
+      setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
-      setError(err.response?.data?.detail || 'Не удалось запустить звонок');
+      setError(err.response?.data?.detail || 'Не удалось сохранить настройки');
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-purple-600"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen py-12 px-4">
       <div className="max-w-4xl mx-auto">
         <div className="glass-card rounded-2xl p-8 mb-6">
           <h1 className="text-4xl font-bold text-white mb-3">
-            {templateData ? 'Настроить и запустить звонок' : 'Запустить демо-звонок'}
+            Настройки входящих звонков
           </h1>
           <p className="text-white/80 text-lg">
-            {templateData
-              ? 'Проверьте и при необходимости измените настройки шаблона, затем введите номер телефона'
-              : 'Заполните данные, чтобы запустить звонок с ИИ-ассистентом'}
+            Настройте поведение ИИ-ассистента при входящих звонках
           </p>
         </div>
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Активность */}
           <div className="glass-card rounded-2xl p-6">
-            <label htmlFor="phone_number" className="block text-sm font-bold text-white/80 mb-3 uppercase tracking-wide">
-              Номер телефона
-            </label>
-            <input
-              id="phone_number"
-              name="phone_number"
-              type="tel"
-              placeholder="+79277654321"
-              value={formData.phone_number}
-              onChange={handleChange}
-              className="glass-input w-full px-5 py-4 rounded-xl text-white font-medium text-lg placeholder:text-white/50"
-              required
-            />
+            <div className="flex items-center justify-between">
+              <div>
+                <label className="block text-sm font-bold text-white/80 uppercase tracking-wide">
+                  Статус
+                </label>
+                <p className="text-white/60 text-sm mt-1">
+                  Включить обработку входящих звонков
+                </p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  name="is_active"
+                  checked={formData.is_active}
+                  onChange={handleChange}
+                  className="sr-only peer"
+                />
+                <div className="w-14 h-7 bg-white/20 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-green-500"></div>
+              </label>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -240,18 +231,18 @@ function StartCall() {
                   className="glass-input w-full px-5 py-4 rounded-xl text-white font-medium text-left flex items-center justify-between hover:bg-purple-500/20 transition-colors"
                 >
                   <span>
-                    {voices.find(v => v.voiceId === formData.voice)?.label} ({voices.find(v => v.voiceId === formData.voice)?.description})
+                    {voices.find(v => v.voiceId === formData.voice)?.label || 'Выберите голос'} ({voices.find(v => v.voiceId === formData.voice)?.description || ''})
                   </span>
-                  <svg 
-                    className={`w-5 h-5 transition-transform ${voiceDropdownOpen ? 'rotate-180' : ''}`} 
-                    fill="none" 
-                    stroke="currentColor" 
+                  <svg
+                    className={`w-5 h-5 transition-transform ${voiceDropdownOpen ? 'rotate-180' : ''}`}
+                    fill="none"
+                    stroke="currentColor"
                     viewBox="0 0 24 24"
                   >
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </button>
-                
+
                 {voiceDropdownOpen && (
                   <div className="absolute z-[100] w-full mt-2 glass-card rounded-xl overflow-hidden shadow-2xl max-h-96 overflow-y-auto">
                     {voices.map((voice) => (
@@ -291,9 +282,6 @@ function StartCall() {
                   </div>
                 )}
               </div>
-              <p className="text-xs text-white/60 mt-2">
-                Все голоса поддерживают несколько языков. Нажмите кнопку проигрывания, чтобы прослушать голос
-              </p>
             </div>
           </div>
 
@@ -305,7 +293,7 @@ function StartCall() {
               id="greeting_message"
               name="greeting_message"
               rows="3"
-              placeholder="Здравствуйте! Вас приветствует HALO AI..."
+              placeholder="Здравствуйте! Чем могу помочь?"
               value={formData.greeting_message}
               onChange={handleChange}
               className="glass-input w-full px-5 py-4 rounded-xl text-white font-medium resize-none placeholder:text-white/50"
@@ -315,21 +303,18 @@ function StartCall() {
 
           <div className="glass-card rounded-2xl p-6">
             <label htmlFor="funnel_goal" className="block text-sm font-bold text-white/80 mb-3 uppercase tracking-wide">
-              Цель звонка
+              Цель разговора
             </label>
             <textarea
               id="funnel_goal"
               name="funnel_goal"
               rows="2"
-              placeholder="Получить контакты клиента, договориться о встрече и т.п."
+              placeholder="Помочь клиенту решить его вопрос"
               value={formData.funnel_goal}
               onChange={handleChange}
               className="glass-input w-full px-5 py-4 rounded-xl text-white font-medium resize-none placeholder:text-white/50"
               required
             />
-            <p className="text-sm text-white/60 mt-2">
-              Какова основная цель этого звонка?
-            </p>
           </div>
 
           <div className="glass-card rounded-2xl p-6">
@@ -340,14 +325,14 @@ function StartCall() {
               id="prompt"
               name="prompt"
               rows="8"
-              placeholder="Ты — полезный ассистент по продажам. Твоя задача..."
+              placeholder="Ты - полезный ассистент. Помогай клиентам с их вопросами..."
               value={formData.prompt}
               onChange={handleChange}
               className="glass-input w-full px-5 py-4 rounded-xl text-white font-medium resize-none placeholder:text-white/50"
               required
             />
             <p className="text-sm text-white/60 mt-2">
-              Опишите поведение ИИ, его цели и стратегию разговора
+              Опишите поведение ИИ при входящих звонках
             </p>
           </div>
 
@@ -357,18 +342,24 @@ function StartCall() {
             </div>
           )}
 
+          {success && (
+            <div className="glass-dark rounded-2xl px-6 py-4 border border-green-400/50">
+              <p className="text-green-200 font-medium">{success}</p>
+            </div>
+          )}
+
           <button
             type="submit"
-            disabled={loading}
+            disabled={saving}
             className="glass-button w-full text-white font-bold py-5 rounded-2xl text-lg disabled:opacity-50 disabled:cursor-not-allowed glow-hover transition-smooth"
           >
-            {loading ? (
+            {saving ? (
               <span className="flex items-center justify-center space-x-3">
                 <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
-                <span>Запуск звонка...</span>
+                <span>Сохранение...</span>
               </span>
             ) : (
-              'Запустить демо-звонок'
+              'Сохранить настройки'
             )}
           </button>
         </form>
@@ -377,4 +368,4 @@ function StartCall() {
   );
 }
 
-export default StartCall;
+export default InboundSettings;

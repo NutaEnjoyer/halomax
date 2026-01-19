@@ -12,6 +12,7 @@ from app.core.database import Base
 from app.core.config import settings
 from app.models.user import User
 from app.models.call import Call
+from app.models.inbound_config import InboundConfig
 
 config = context.config
 

@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.core.database import engine, Base
-from app.api import auth, calls
+from app.api import auth, calls, inbound
 
 # Create tables
 Base.metadata.create_all(bind=engine)
@@ -26,6 +26,7 @@ app.add_middleware(
 # Note: nginx already adds /api prefix, so we don't add it here
 app.include_router(auth.router, prefix="/auth", tags=["auth"])
 app.include_router(calls.router, prefix="", tags=["calls"])
+app.include_router(inbound.router, prefix="", tags=["inbound"])
 
 
 @app.get("/")

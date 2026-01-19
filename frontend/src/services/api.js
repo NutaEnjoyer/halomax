@@ -42,4 +42,9 @@ export const callsAPI = {
   getAnalytics: () => api.get('/analytics'),
 };
 
+export const inboundAPI = {
+  getConfig: () => api.get('/inbound/config'),
+  updateConfig: (data) => api.put('/inbound/config', data),
+};
+
 export default api;
