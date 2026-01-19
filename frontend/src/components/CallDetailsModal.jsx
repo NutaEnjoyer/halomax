@@ -51,19 +51,6 @@ function CallDetailsModal({ call: initialCall, onClose }) {
     });
   };
 
-  const getFollowUp = (followUpMessage) => {
-    return (
-      "HALO сам проанализировал разговор и отправил клиенту сообщение,\n" +
-      "чтобы продолжить диалог.\n\n" +
-      "📩 Отправлено клиенту в Telegram\n" +
-      "⏱ Через 12 секунд после окончания звонка\n\n" +
-      "HALO → Клиенту:\n" +
-      "\n" +
-      followUpMessage + "\n" +
-      "--------------------------------"
-    );
-  };
-
   // Parse transcript from format {"msg1","msg2",...} to array
   const parseTranscript = (transcript) => {
     if (!transcript) return [];
@@ -202,8 +189,25 @@ function CallDetailsModal({ call: initialCall, onClose }) {
             {/* Follow-up Message */}
             {call.followup_message && (
               <div className="glass-card rounded-xl p-6 border-l-4 border-green-500">
-                <h3 className="font-bold text-white mb-3 text-lg">Что HALO сделал после звонка</h3>
-                <p className="text-white/80 leading-relaxed">{getFollowUp(call.followup_message)}</p>
+                <h3 className="font-bold text-white mb-4 text-lg">Что HALO сделал после звонка</h3>
+
+                <p className="text-white/70 text-sm mb-4">
+                  HALO проанализировал разговор и автоматически отправил клиенту сообщение для продолжения диалога
+                </p>
+
+                <div className="flex items-center gap-4 mb-4 text-sm">
+                  <div className="flex items-center gap-2 text-green-300">
+                    <span>Telegram</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-white/60">
+                    <span>Через 12 сек после звонка</span>
+                  </div>
+                </div>
+
+                <div className="bg-white/10 rounded-xl p-4">
+                  <p className="text-xs text-white/50 mb-2 uppercase tracking-wide">Сообщение клиенту</p>
+                  <p className="text-white/90 leading-relaxed">{call.followup_message}</p>
+                </div>
               </div>
             )}
 

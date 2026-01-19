@@ -1,6 +1,16 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
+// Маппинг voiceId -> название голоса
+const voiceNames = {
+  '3EuKHIEZbSzrHGNmdYsx': 'Николай',
+  '0BcDz9UPwL3MpsnTeUlO': 'Денис',
+  'ymDCYd8puC7gYjxIamPt': 'Марина',
+  'Jbte7ht1CqapnZvc4KpK': 'Кари',
+  'EDpEYNf6XIeKYRzYcx4I': 'Мария',
+  'HcaxAsrhw4ByUo4CBCBN': 'Максим',
+};
+
 const templates = [
   {
     id: 1,
@@ -194,7 +204,7 @@ function Templates() {
                     <div className="space-y-3 mb-6">
                       <div className="flex items-center">
                         <span className="text-xs font-bold text-white/60 uppercase tracking-wide mr-3">Голос:</span>
-                        <span className="text-sm font-semibold text-white capitalize">{template.template.voice}</span>
+                        <span className="text-sm font-semibold text-white">{voiceNames[template.template.voice] || template.template.voice}</span>
                       </div>
                       <div className="flex items-center">
                         <span className="text-xs font-bold text-white/60 uppercase tracking-wide mr-3">Язык:</span>

@@ -19,42 +19,41 @@ function StartCall() {
   // mp3 - название файла в /public/voices/ (без расширения)
   const voices = [
     {
-      label: 'Nikolay',
+      label: 'Николай',
       voiceId: '3EuKHIEZbSzrHGNmdYsx',
-      description: 'Confident and Clear',
+      description: 'Уверенный и чёткий',
       mp3: 'Nikolay'
     },
     {
-      label: 'Denis',
-      voiceId: '0BcDz9UPwL3MpsnTeUlO',
-      description: 'Pleasant, Engagind and Friendly',
-      mp3: 'Denis'
-    },
-    {
-      label: 'Marina',
+      label: 'Марина',
       voiceId: 'ymDCYd8puC7gYjxIamPt',
-      description: 'Soft, Clear and Warm',
+      description: 'Мягкий и тёплый',
       mp3: 'Marina'
     },
     {
-      label: 'Kari',
+      label: 'Денис',
+      voiceId: '0BcDz9UPwL3MpsnTeUlO',
+      description: 'Приятный и дружелюбный',
+      mp3: 'Denis'
+    },
+    {
+      label: 'Кари',
       voiceId: 'Jbte7ht1CqapnZvc4KpK',
-      description: 'Warm, Engagind and Friendly',
+      description: 'Тёплый и дружелюбный',
       mp3: 'Kari'
     },
     {
-      label: 'Maria',
+      label: 'Мария',
       voiceId: 'EDpEYNf6XIeKYRzYcx4I',
-      description: 'Measured, Calm and Engagind',
+      description: 'Спокойный и размеренный',
       mp3: 'Maria'
     },
     {
-      label: 'Maxim',
+      label: 'Максим',
       voiceId: 'HcaxAsrhw4ByUo4CBCBN',
-      description: 'Calm & Neutral',
+      description: 'Спокойный и нейтральный',
       mp3: 'Maxim'
-    },
-    // Добавьте больше голосов по этому шаблону
+    }
   ];
 
   // Get template data from navigation state
