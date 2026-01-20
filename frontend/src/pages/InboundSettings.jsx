@@ -175,6 +175,20 @@ function InboundSettings() {
           </p>
         </div>
 
+        {/* Номер для входящих */}
+        <div className="glass-card rounded-2xl p-6 mb-6 border-l-4 border-green-500">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-bold text-white/70 uppercase tracking-wide mb-1">Номер для входящих звонков</p>
+              <p className="text-2xl font-bold text-white">+7 (865) 259-40-87</p>
+            </div>
+            <div className="flex items-center gap-2 px-4 py-2 bg-green-500/20 rounded-xl">
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+              <span className="text-green-300 font-medium text-sm">Активен</span>
+            </div>
+          </div>
+        </div>
+
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Активность */}
           <div className="glass-card rounded-2xl p-6">
