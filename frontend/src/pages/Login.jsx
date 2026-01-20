@@ -42,12 +42,12 @@ function Login() {
           <h1 className="text-4xl font-bold mb-2">
             <span className="gradient-text">HALO AI</span>
           </h1>
-          <p className="text-gray-600">Платформа автоматизации звонков на базе ИИ</p>
+          <p className="text-white/70">Платформа автоматизации звонков на базе ИИ</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label htmlFor="username" className="block text-sm font-semibold text-gray-700 mb-2">
+            <label htmlFor="username" className="block text-sm font-semibold text-white/80 mb-2">
               Логин
             </label>
             <input
@@ -55,14 +55,14 @@ function Login() {
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="glass-input w-full px-4 py-3 rounded-xl text-gray-900 font-medium"
+              className="glass-input w-full px-4 py-3 rounded-xl text-white font-medium placeholder:text-white/50"
               placeholder="Введите логин"
               required
             />
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
+            <label htmlFor="password" className="block text-sm font-semibold text-white/80 mb-2">
               Пароль
             </label>
             <input
@@ -70,7 +70,7 @@ function Login() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="glass-input w-full px-4 py-3 rounded-xl text-gray-900 font-medium"
+              className="glass-input w-full px-4 py-3 rounded-xl text-white font-medium placeholder:text-white/50"
               placeholder="Введите пароль"
               required
             />
@@ -98,8 +98,8 @@ function Login() {
           </button>
         </form>
 
-        <div className="mt-6 pt-6 border-t border-gray-200">
-          <p className="text-center text-sm text-gray-500">
+        <div className="mt-6 pt-6 border-t border-white/20">
+          <p className="text-center text-sm text-white/60">
             <span className="font-medium">Тестовые данные для входа:</span> admin / admin
           </p>
         </div>
