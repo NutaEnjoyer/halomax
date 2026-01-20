@@ -29,7 +29,10 @@ class VoximplantService:
         voice: str,
         greeting_message: str,
         prompt: str,
-        funnel_goal: str
+        funnel_goal: str,
+        stability: float = 0.5,
+        speed: float = 1.0,
+        similarity_boost: float = 0.75
     ) -> Optional[str]:
         """
         Initiates a call via Voximplant using script_custom_data
@@ -50,7 +53,11 @@ class VoximplantService:
             "funnel_goal": funnel_goal,
             "openai_api_key": self.openai_api_key,
             "elevenlabs_api_key": self.elevenlabs_api_key,
-            "elevenlabs_agent_id": self.elevenlabs_agent_id
+            "elevenlabs_agent_id": self.elevenlabs_agent_id,
+            # ElevenLabs voice settings
+            "stability": stability,
+            "speed": speed,
+            "similarity_boost": similarity_boost
         }
 
         print(f"[Voximplant] Starting call to {phone_number}")

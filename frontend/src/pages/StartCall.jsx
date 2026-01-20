@@ -66,6 +66,10 @@ function StartCall() {
     greeting_message: templateData?.greeting_message || '',
     prompt: templateData?.prompt || '',
     funnel_goal: templateData?.funnel_goal || '',
+    // ElevenLabs voice settings
+    stability: 0.5,
+    speed: 1.0,
+    similarity_boost: 0.75,
   });
 
   // Update form when template changes
@@ -78,6 +82,9 @@ function StartCall() {
         greeting_message: templateData.greeting_message || '',
         prompt: templateData.prompt || '',
         funnel_goal: templateData.funnel_goal || '',
+        stability: 0.5,
+        speed: 1.0,
+        similarity_boost: 0.75,
       });
     }
   }, [templateData]);
@@ -110,9 +117,10 @@ function StartCall() {
   }, [voiceDropdownOpen]);
 
   const handleChange = (e) => {
+    const { name, value, type } = e.target;
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: type === 'range' ? parseFloat(value) : value,
     });
   };
 
@@ -294,6 +302,69 @@ function StartCall() {
               <p className="text-xs text-white/60 mt-2">
                 Все голоса поддерживают несколько языков. Нажмите кнопку проигрывания, чтобы прослушать голос
               </p>
+            </div>
+          </div>
+
+          {/* Voice Settings Sliders */}
+          <div className="glass-card rounded-2xl p-6">
+            <h3 className="text-sm font-bold text-white/80 mb-5 uppercase tracking-wide">Настройки голоса</h3>
+            <div className="space-y-6">
+              {/* Stability */}
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                  <label className="text-sm font-medium text-white/70">Стабильность</label>
+                  <span className="text-sm font-bold text-white">{formData.stability.toFixed(2)}</span>
+                </div>
+                <input
+                  type="range"
+                  name="stability"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  value={formData.stability}
+                  onChange={handleChange}
+                  className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer accent-purple-500"
+                />
+                <p className="text-xs text-white/50 mt-1">Чем выше, тем стабильнее и монотоннее голос</p>
+              </div>
+
+              {/* Speed */}
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                  <label className="text-sm font-medium text-white/70">Скорость</label>
+                  <span className="text-sm font-bold text-white">{formData.speed.toFixed(2)}x</span>
+                </div>
+                <input
+                  type="range"
+                  name="speed"
+                  min="0.5"
+                  max="2"
+                  step="0.01"
+                  value={formData.speed}
+                  onChange={handleChange}
+                  className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer accent-purple-500"
+                />
+                <p className="text-xs text-white/50 mt-1">Скорость воспроизведения речи</p>
+              </div>
+
+              {/* Similarity Boost */}
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                  <label className="text-sm font-medium text-white/70">Схожесть</label>
+                  <span className="text-sm font-bold text-white">{formData.similarity_boost.toFixed(2)}</span>
+                </div>
+                <input
+                  type="range"
+                  name="similarity_boost"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  value={formData.similarity_boost}
+                  onChange={handleChange}
+                  className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer accent-purple-500"
+                />
+                <p className="text-xs text-white/50 mt-1">Усиление схожести с оригинальным голосом</p>
+              </div>
             </div>
           </div>
 

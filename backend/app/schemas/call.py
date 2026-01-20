@@ -7,10 +7,14 @@ from app.models.call import CallStatus, DispositionType, CRMStatus
 class CallCreate(BaseModel):
     phone_number: str
     language: str  # ru, uz, tj, auto
-    voice: str  # male, female, neutral
+    voice: str  # ElevenLabs voice ID
     greeting_message: str
     prompt: str
     funnel_goal: str  # Цель звонка (воронка)
+    # ElevenLabs voice settings
+    stability: Optional[float] = 0.5
+    speed: Optional[float] = 1.0
+    similarity_boost: Optional[float] = 0.75
 
 
 class CallResponse(BaseModel):
