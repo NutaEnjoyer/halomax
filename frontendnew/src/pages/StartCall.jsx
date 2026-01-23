@@ -1,13 +1,24 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { callsAPI } from '../services/api';
-import { Phone, Play, Pause, ChevronDown, AlertCircle, Volume2, Mic } from 'lucide-react';
+import { Phone, Play, Pause, ChevronDown, AlertCircle, Volume2, Mic, Info } from 'lucide-react';
+
+// Tooltip component
+const Tooltip = ({ text }) => (
+  <div className="group relative inline-flex ml-1">
+    <Info className="w-4 h-4 text-gray-400 cursor-help" />
+    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 w-64 z-50 pointer-events-none">
+      {text}
+      <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900"></div>
+    </div>
+  </div>
+);
 
 // TTS Providers
 const TTS_PROVIDERS = [
   { id: 'elevenlabs', name: 'ElevenLabs', description: 'Высокое качество, русские голоса' },
   { id: 'openai', name: 'OpenAI', description: 'Быстрый, многоязычный' },
-  { id: 'yandex', name: 'Yandex', description: 'Скоро...' },
+  { id: 'yandex', name: 'Yandex', description: 'Русские голоса, низкая цена' },
 ];
 
 // Voices by TTS provider
@@ -32,8 +43,13 @@ const VOICES_BY_PROVIDER = {
     { label: 'Sage', voiceId: 'sage', description: 'Мудрый', mp3: 'sage' },
   ],
   yandex: [
-    { label: 'Алёна', voiceId: 'alena', description: 'Женский (скоро)', mp3: null },
-    { label: 'Филипп', voiceId: 'filipp', description: 'Мужской (скоро)', mp3: null },
+    { label: 'Алёна', voiceId: 'alena', description: 'Женский, нейтральный', mp3: null },
+    { label: 'Филипп', voiceId: 'filipp', description: 'Мужской, нейтральный', mp3: null },
+    { label: 'Ермиль', voiceId: 'ermil', description: 'Мужской, нейтральный', mp3: null },
+    { label: 'Жанна', voiceId: 'jane', description: 'Женский, нейтральный', mp3: null },
+    { label: 'Мадирус', voiceId: 'madirus', description: 'Мужской, нейтральный', mp3: null },
+    { label: 'Омаж', voiceId: 'omazh', description: 'Женский, нейтральный', mp3: null },
+    { label: 'Захар', voiceId: 'zahar', description: 'Мужской, нейтральный', mp3: null },
   ],
 };
 
@@ -181,8 +197,6 @@ export default function StartCall() {
     }
   };
 
-  const isYandex = formData.tts_provider === 'yandex';
-
   return (
     <div className="max-w-4xl mx-auto animate-fadeIn">
       {/* Header */}
@@ -227,12 +241,9 @@ export default function StartCall() {
                 key={provider.id}
                 type="button"
                 onClick={() => handleTTSChange(provider.id)}
-                disabled={provider.id === 'yandex'}
                 className={`p-4 rounded-lg border-2 text-left transition-all ${
                   formData.tts_provider === provider.id
                     ? 'border-blue-600 bg-blue-50'
-                    : provider.id === 'yandex'
-                    ? 'border-gray-200 bg-gray-50 opacity-60 cursor-not-allowed'
                     : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
                 }`}
               >
@@ -267,11 +278,8 @@ export default function StartCall() {
             </label>
             <button
               type="button"
-              onClick={() => !isYandex && setVoiceDropdownOpen(!voiceDropdownOpen)}
-              disabled={isYandex}
-              className={`input text-left flex items-center justify-between ${
-                isYandex ? 'opacity-60 cursor-not-allowed' : ''
-              }`}
+              onClick={() => setVoiceDropdownOpen(!voiceDropdownOpen)}
+              className="input text-left flex items-center justify-between"
             >
               <span>
                 {selectedVoice?.label || 'Выберите голос'} — {selectedVoice?.description || ''}
@@ -283,7 +291,7 @@ export default function StartCall() {
               />
             </button>
 
-            {voiceDropdownOpen && !isYandex && (
+            {voiceDropdownOpen && (
               <div className="absolute z-50 w-full mt-2 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden max-h-80 overflow-y-auto">
                 {currentVoices.map((voice) => (
                   <div
@@ -319,9 +327,7 @@ export default function StartCall() {
               </div>
             )}
             <p className="text-xs text-gray-500 mt-2">
-              {isYandex
-                ? 'Yandex TTS скоро будет доступен'
-                : 'Нажмите кнопку воспроизведения, чтобы прослушать голос'}
+              Нажмите кнопку воспроизведения, чтобы прослушать голос
             </p>
           </div>
         </div>
@@ -337,7 +343,10 @@ export default function StartCall() {
               {/* Stability */}
               <div>
                 <div className="flex justify-between items-center mb-2">
-                  <label className="text-sm text-gray-600">Стабильность</label>
+                  <div className="flex items-center">
+                    <label className="text-sm text-gray-600">Стабильность</label>
+                    <Tooltip text="Более высокие значения сделают речь более последовательной, но также могут сделать её звучать монотонно. Более низкие значения сделают речь более выразительной, но могут привести к нестабильности." />
+                  </div>
                   <span className="text-sm font-semibold text-gray-900">
                     {formData.stability.toFixed(2)}
                   </span>
@@ -352,13 +361,15 @@ export default function StartCall() {
                   onChange={handleChange}
                   className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
                 />
-                <p className="text-xs text-gray-500 mt-1">Выше = стабильнее</p>
               </div>
 
               {/* Speed */}
               <div>
                 <div className="flex justify-between items-center mb-2">
-                  <label className="text-sm text-gray-600">Скорость</label>
+                  <div className="flex items-center">
+                    <label className="text-sm text-gray-600">Скорость</label>
+                    <Tooltip text="Контролирует скорость генерируемой речи. Значения ниже 1.0 замедлят речь, в то время как значения выше 1.0 ускорят её. Экстремальные значения могут повлиять на качество генерируемой речи." />
+                  </div>
                   <span className="text-sm font-semibold text-gray-900">
                     {formData.speed.toFixed(2)}x
                   </span>
@@ -373,13 +384,15 @@ export default function StartCall() {
                   onChange={handleChange}
                   className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
                 />
-                <p className="text-xs text-gray-500 mt-1">Скорость речи</p>
               </div>
 
               {/* Similarity Boost */}
               <div>
                 <div className="flex justify-between items-center mb-2">
-                  <label className="text-sm text-gray-600">Схожесть</label>
+                  <div className="flex items-center">
+                    <label className="text-sm text-gray-600">Схожесть</label>
+                    <Tooltip text="Более высокие значения повысят общую ясность и последовательность голоса. Очень высокие значения могут привести к артефактам. Рекомендуется регулировать это значение, чтобы найти правильный баланс." />
+                  </div>
                   <span className="text-sm font-semibold text-gray-900">
                     {formData.similarity_boost.toFixed(2)}
                   </span>
@@ -394,7 +407,6 @@ export default function StartCall() {
                   onChange={handleChange}
                   className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
                 />
-                <p className="text-xs text-gray-500 mt-1">Схожесть с оригиналом</p>
               </div>
             </div>
           </div>
@@ -411,7 +423,10 @@ export default function StartCall() {
               {/* Speed */}
               <div>
                 <div className="flex justify-between items-center mb-2">
-                  <label className="text-sm text-gray-600">Скорость</label>
+                  <div className="flex items-center">
+                    <label className="text-sm text-gray-600">Скорость</label>
+                    <Tooltip text="Контролирует скорость генерируемой речи. Значения ниже 1.0 замедлят речь, в то время как значения выше 1.0 ускорят её. Экстремальные значения могут повлиять на качество генерируемой речи." />
+                  </div>
                   <span className="text-sm font-semibold text-gray-900">
                     {formData.speed.toFixed(2)}x
                   </span>
@@ -426,7 +441,40 @@ export default function StartCall() {
                   onChange={handleChange}
                   className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
                 />
-                <p className="text-xs text-gray-500 mt-1">От 0.25x до 4x</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Yandex Voice Settings */}
+        {formData.tts_provider === 'yandex' && (
+          <div className="card">
+            <div className="flex items-center gap-2 mb-5">
+              <Volume2 className="w-5 h-5 text-gray-400" />
+              <h3 className="font-semibold text-gray-900">Настройки голоса Yandex</h3>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Speed */}
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                  <div className="flex items-center">
+                    <label className="text-sm text-gray-600">Скорость</label>
+                    <Tooltip text="Скорость синтезированной речи. Значение 1.0 — стандартная скорость. Диапазон: 0.1 - 3.0" />
+                  </div>
+                  <span className="text-sm font-semibold text-gray-900">
+                    {formData.speed.toFixed(2)}x
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  name="speed"
+                  min="0.1"
+                  max="3"
+                  step="0.1"
+                  value={formData.speed}
+                  onChange={handleChange}
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                />
               </div>
             </div>
           </div>
@@ -491,7 +539,7 @@ export default function StartCall() {
         {/* Submit Button */}
         <button
           type="submit"
-          disabled={loading || isYandex}
+          disabled={loading}
           className="btn-primary w-full py-4 text-lg"
         >
           {loading ? (

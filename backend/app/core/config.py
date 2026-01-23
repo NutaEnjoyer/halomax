@@ -26,6 +26,10 @@ class Settings(BaseSettings):
     ELEVENLABS_API_KEY: str
     ELEVENLABS_AGENT_ID: str
 
+    # Yandex
+    YANDEX_API_KEY: Optional[str] = None
+    YANDEX_FOLDER_ID: Optional[str] = None
+
     # Webhook
     WEBHOOK_URL: str
 

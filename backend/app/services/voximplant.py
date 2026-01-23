@@ -17,6 +17,8 @@ class VoximplantService:
         self.openai_api_key = settings.OPENAI_API_KEY
         self.elevenlabs_api_key = settings.ELEVENLABS_API_KEY
         self.elevenlabs_agent_id = settings.ELEVENLABS_AGENT_ID
+        self.yandex_api_key = settings.YANDEX_API_KEY
+        self.yandex_folder_id = settings.YANDEX_FOLDER_ID
 
     # Temporary storage for call data (in production use database)
     _call_data_store = {}
@@ -57,6 +59,8 @@ class VoximplantService:
             "openai_api_key": self.openai_api_key,
             "elevenlabs_api_key": self.elevenlabs_api_key,
             "elevenlabs_agent_id": self.elevenlabs_agent_id,
+            "yandex_api_key": self.yandex_api_key,
+            "yandex_folder_id": self.yandex_folder_id,
             # Voice settings
             "stability": stability,
             "speed": speed,
