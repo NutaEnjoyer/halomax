@@ -9,6 +9,7 @@ from app.core.database import get_db
 from app.api.deps import get_current_user
 from app.models.user import User
 from app.models.call import Call, CallStatus, DispositionType, CRMStatus
+from app.models.inbound_config import InboundConfig
 from app.schemas.call import CallCreate, CallResponse, CallListItem, CallAnalytics
 from app.services.voximplant import voximplant_service
 from app.services.openai_service import openai_service
@@ -146,6 +147,7 @@ async def create_call(
     new_call = Call(
         phone_number=call_data.phone_number,
         language=call_data.language,
+        tts_provider=call_data.tts_provider,
         voice=call_data.voice,
         greeting_message=call_data.greeting_message,
         prompt=call_data.prompt,
@@ -164,6 +166,7 @@ async def create_call(
             call_id=call_id,
             phone_number=call_data.phone_number,
             language=call_data.language,
+            tts_provider=call_data.tts_provider,
             voice=call_data.voice,
             greeting_message=call_data.greeting_message,
             prompt=call_data.prompt,
@@ -298,12 +301,36 @@ async def receive_call_transcript(
         print(f"[Webhook] Raw text length: {len(raw_text)}")
         print(f"[Webhook] Raw text: {raw_text[:200] if raw_text else 'EMPTY'}")
 
-        # Find call by call_id
+        # Find call by call_id (for outbound calls)
         call = db.query(Call).filter(Call.call_id == call_id).first()
 
         if not call:
-            print(f"[Webhook] Call not found with call_id: {call_id}")
-            return {"status": "error", "message": "Call not found"}
+            # This is an inbound call - create new record
+            print(f"[Webhook] Call not found with call_id: {call_id} - creating as INBOUND call")
+
+            # Get inbound config for settings
+            inbound_config = db.query(InboundConfig).filter(InboundConfig.is_active == True).first()
+
+            # Generate our own internal call_id
+            internal_call_id = str(uuid.uuid4())
+
+            # Create new call record for inbound
+            call = Call(
+                phone_number=phone or "unknown",
+                language=inbound_config.language if inbound_config else "ru",
+                voice=inbound_config.voice if inbound_config else "3EuKHIEZbSzrHGNmdYsx",
+                greeting_message=inbound_config.greeting_message if inbound_config else "Входящий звонок",
+                prompt=inbound_config.prompt if inbound_config else "",
+                funnel_goal=inbound_config.funnel_goal if inbound_config else "",
+                status=CallStatus.ANALYZING,
+                call_id=internal_call_id,
+                voximplant_call_id=call_id,  # Save original Voximplant call_id
+            )
+            db.add(call)
+            db.commit()
+            db.refresh(call)
+
+            print(f"[Webhook] Created INBOUND call with ID: {call.id}, internal call_id: {internal_call_id}")
 
 
         # Update call with transcript

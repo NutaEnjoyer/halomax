@@ -38,7 +38,8 @@ class Call(Base):
     # Call info
     phone_number = Column(String, nullable=False)
     language = Column(String, nullable=False)  # ru, uz, tj, auto
-    voice = Column(String, nullable=False)  # male, female, neutral
+    tts_provider = Column(String, nullable=False, default="elevenlabs")  # elevenlabs, openai, yandex
+    voice = Column(String, nullable=False)  # Voice ID or name
     greeting_message = Column(Text, nullable=False)
     prompt = Column(Text, nullable=False)
     funnel_goal = Column(Text, nullable=False)  # Цель звонка (воронка)

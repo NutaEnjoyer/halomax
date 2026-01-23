@@ -26,6 +26,7 @@ class VoximplantService:
         call_id: str,
         phone_number: str,
         language: str,
+        tts_provider: str,
         voice: str,
         greeting_message: str,
         prompt: str,
@@ -36,6 +37,7 @@ class VoximplantService:
     ) -> Optional[str]:
         """
         Initiates a call via Voximplant using script_custom_data
+        TTS providers: elevenlabs, openai, yandex
         Returns: media_session_access_url or None
         """
         import json
@@ -47,6 +49,7 @@ class VoximplantService:
             "phone": phone_number,
             "caller_id": self.caller_id,
             "language": language,
+            "tts_provider": tts_provider,
             "voice": voice,
             "greeting_message": greeting_message,
             "prompt": prompt,
@@ -54,13 +57,13 @@ class VoximplantService:
             "openai_api_key": self.openai_api_key,
             "elevenlabs_api_key": self.elevenlabs_api_key,
             "elevenlabs_agent_id": self.elevenlabs_agent_id,
-            # ElevenLabs voice settings
+            # Voice settings
             "stability": stability,
             "speed": speed,
             "similarity_boost": similarity_boost
         }
 
-        print(f"[Voximplant] Starting call to {phone_number}")
+        print(f"[Voximplant] Starting call to {phone_number} with TTS: {tts_provider}")
         print(f"[Voximplant] Custom data: {json.dumps(custom_data)}")
 
         # Build form data with script_custom_data

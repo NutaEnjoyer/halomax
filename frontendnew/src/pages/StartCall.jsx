@@ -1,23 +1,41 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { callsAPI } from '../services/api';
-import { Phone, Play, Pause, ChevronDown, AlertCircle, Volume2 } from 'lucide-react';
+import { Phone, Play, Pause, ChevronDown, AlertCircle, Volume2, Mic } from 'lucide-react';
 
-// ElevenLabs voices
-const voices = [
-  {
-    label: 'Николай',
-    voiceId: '3EuKHIEZbSzrHGNmdYsx',
-    description: 'Уверенный и чёткий',
-    mp3: 'Nikolay',
-  },
-  {
-    label: 'Марина',
-    voiceId: 'ymDCYd8puC7gYjxIamPt',
-    description: 'Мягкий и тёплый',
-    mp3: 'Marina',
-  },
+// TTS Providers
+const TTS_PROVIDERS = [
+  { id: 'elevenlabs', name: 'ElevenLabs', description: 'Высокое качество, русские голоса' },
+  { id: 'openai', name: 'OpenAI', description: 'Быстрый, многоязычный' },
+  { id: 'yandex', name: 'Yandex', description: 'Скоро...' },
 ];
+
+// Voices by TTS provider
+const VOICES_BY_PROVIDER = {
+  elevenlabs: [
+    { label: 'Николай', voiceId: '3EuKHIEZbSzrHGNmdYsx', description: 'Уверенный и чёткий', mp3: 'Nikolay' },
+    { label: 'Марина', voiceId: 'ymDCYd8puC7gYjxIamPt', description: 'Мягкий и тёплый', mp3: 'Marina' },
+    { label: 'Денис', voiceId: '0BcDz9UPwL3MpsnTeUlO', description: 'Приятный и дружелюбный', mp3: 'Denis' },
+    { label: 'Кари', voiceId: 'Jbte7ht1CqapnZvc4KpK', description: 'Тёплый и дружелюбный', mp3: 'Kari' },
+    { label: 'Мария', voiceId: 'EDpEYNf6XIeKYRzYcx4I', description: 'Спокойный и размеренный', mp3: 'Maria' },
+    { label: 'Максим', voiceId: 'HcaxAsrhw4ByUo4CBCBN', description: 'Спокойный и нейтральный', mp3: 'Maxim' },
+  ],
+  openai: [
+    { label: 'Alloy', voiceId: 'alloy', description: 'Нейтральный', mp3: 'alloy' },
+    { label: 'Echo', voiceId: 'echo', description: 'Мужской', mp3: 'echo' },
+    { label: 'Fable', voiceId: 'fable', description: 'Выразительный', mp3: 'fable' },
+    { label: 'Onyx', voiceId: 'onyx', description: 'Глубокий мужской', mp3: 'onyx' },
+    { label: 'Nova', voiceId: 'nova', description: 'Женский', mp3: 'nova' },
+    { label: 'Shimmer', voiceId: 'shimmer', description: 'Мягкий женский', mp3: 'shimmer' },
+    { label: 'Ash', voiceId: 'ash', description: 'Спокойный', mp3: 'ash' },
+    { label: 'Coral', voiceId: 'coral', description: 'Тёплый', mp3: 'coral' },
+    { label: 'Sage', voiceId: 'sage', description: 'Мудрый', mp3: 'sage' },
+  ],
+  yandex: [
+    { label: 'Алёна', voiceId: 'alena', description: 'Женский (скоро)', mp3: null },
+    { label: 'Филипп', voiceId: 'filipp', description: 'Мужской (скоро)', mp3: null },
+  ],
+};
 
 export default function StartCall() {
   const navigate = useNavigate();
@@ -35,7 +53,8 @@ export default function StartCall() {
   const [formData, setFormData] = useState({
     phone_number: '',
     language: templateData?.language || 'ru',
-    voice: templateData?.voice || voices[0]?.voiceId || '',
+    tts_provider: templateData?.tts_provider || 'elevenlabs',
+    voice: templateData?.voice || VOICES_BY_PROVIDER.elevenlabs[0]?.voiceId || '',
     greeting_message: templateData?.greeting_message || '',
     prompt: templateData?.prompt || '',
     funnel_goal: templateData?.funnel_goal || '',
@@ -44,12 +63,20 @@ export default function StartCall() {
     similarity_boost: 0.75,
   });
 
+  // Get current voices based on selected TTS provider
+  const currentVoices = VOICES_BY_PROVIDER[formData.tts_provider] || [];
+  const selectedVoice = currentVoices.find((v) => v.voiceId === formData.voice);
+  const selectedProvider = TTS_PROVIDERS.find((p) => p.id === formData.tts_provider);
+
   // Update form when template changes
   useEffect(() => {
     if (templateData) {
+      const provider = templateData.tts_provider || 'elevenlabs';
+      const voices = VOICES_BY_PROVIDER[provider] || [];
       setFormData({
         phone_number: '',
         language: templateData.language || 'ru',
+        tts_provider: provider,
         voice: templateData.voice || voices[0]?.voiceId || '',
         greeting_message: templateData.greeting_message || '',
         prompt: templateData.prompt || '',
@@ -96,6 +123,15 @@ export default function StartCall() {
     });
   };
 
+  const handleTTSChange = (providerId) => {
+    const voices = VOICES_BY_PROVIDER[providerId] || [];
+    setFormData({
+      ...formData,
+      tts_provider: providerId,
+      voice: voices[0]?.voiceId || '',
+    });
+  };
+
   const handlePlayVoice = (voiceId, e) => {
     e?.stopPropagation();
 
@@ -109,8 +145,8 @@ export default function StartCall() {
       return;
     }
 
-    const voice = voices.find((v) => v.voiceId === voiceId);
-    if (!voice) return;
+    const voice = currentVoices.find((v) => v.voiceId === voiceId);
+    if (!voice || !voice.mp3) return;
 
     const audio = new Audio(`/voices/${voice.mp3}.mp3`);
     audioRef.current = audio;
@@ -145,7 +181,7 @@ export default function StartCall() {
     }
   };
 
-  const selectedVoice = voices.find((v) => v.voiceId === formData.voice);
+  const isYandex = formData.tts_provider === 'yandex';
 
   return (
     <div className="max-w-4xl mx-auto animate-fadeIn">
@@ -179,6 +215,34 @@ export default function StartCall() {
           </div>
         </div>
 
+        {/* TTS Provider */}
+        <div className="card">
+          <div className="flex items-center gap-2 mb-4">
+            <Mic className="w-5 h-5 text-gray-400" />
+            <label className="label mb-0">TTS Провайдер</label>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {TTS_PROVIDERS.map((provider) => (
+              <button
+                key={provider.id}
+                type="button"
+                onClick={() => handleTTSChange(provider.id)}
+                disabled={provider.id === 'yandex'}
+                className={`p-4 rounded-lg border-2 text-left transition-all ${
+                  formData.tts_provider === provider.id
+                    ? 'border-blue-600 bg-blue-50'
+                    : provider.id === 'yandex'
+                    ? 'border-gray-200 bg-gray-50 opacity-60 cursor-not-allowed'
+                    : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                }`}
+              >
+                <div className="font-semibold text-gray-900">{provider.name}</div>
+                <div className="text-xs text-gray-500 mt-1">{provider.description}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Language and Voice */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="card">
@@ -198,14 +262,19 @@ export default function StartCall() {
           </div>
 
           <div className="card relative" ref={voiceDropdownRef}>
-            <label className="label">Голосовая модель</label>
+            <label className="label">
+              Голосовая модель ({selectedProvider?.name})
+            </label>
             <button
               type="button"
-              onClick={() => setVoiceDropdownOpen(!voiceDropdownOpen)}
-              className="input text-left flex items-center justify-between"
+              onClick={() => !isYandex && setVoiceDropdownOpen(!voiceDropdownOpen)}
+              disabled={isYandex}
+              className={`input text-left flex items-center justify-between ${
+                isYandex ? 'opacity-60 cursor-not-allowed' : ''
+              }`}
             >
               <span>
-                {selectedVoice?.label} — {selectedVoice?.description}
+                {selectedVoice?.label || 'Выберите голос'} — {selectedVoice?.description || ''}
               </span>
               <ChevronDown
                 className={`w-5 h-5 text-gray-400 transition-transform ${
@@ -214,9 +283,9 @@ export default function StartCall() {
               />
             </button>
 
-            {voiceDropdownOpen && (
-              <div className="absolute z-50 w-full mt-2 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden">
-                {voices.map((voice) => (
+            {voiceDropdownOpen && !isYandex && (
+              <div className="absolute z-50 w-full mt-2 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden max-h-80 overflow-y-auto">
+                {currentVoices.map((voice) => (
                   <div
                     key={voice.voiceId}
                     className={`flex items-center justify-between px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors ${
@@ -228,102 +297,140 @@ export default function StartCall() {
                       <div className="font-medium text-gray-900">{voice.label}</div>
                       <div className="text-sm text-gray-500">{voice.description}</div>
                     </div>
-                    <button
-                      type="button"
-                      onClick={(e) => handlePlayVoice(voice.voiceId, e)}
-                      className={`p-2 rounded-lg transition-colors ${
-                        playingVoice === voice.voiceId
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                      }`}
-                    >
-                      {playingVoice === voice.voiceId ? (
-                        <Pause size={18} />
-                      ) : (
-                        <Play size={18} />
-                      )}
-                    </button>
+                    {voice.mp3 && (
+                      <button
+                        type="button"
+                        onClick={(e) => handlePlayVoice(voice.voiceId, e)}
+                        className={`p-2 rounded-lg transition-colors ${
+                          playingVoice === voice.voiceId
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        }`}
+                      >
+                        {playingVoice === voice.voiceId ? (
+                          <Pause size={18} />
+                        ) : (
+                          <Play size={18} />
+                        )}
+                      </button>
+                    )}
                   </div>
                 ))}
               </div>
             )}
             <p className="text-xs text-gray-500 mt-2">
-              Нажмите кнопку воспроизведения, чтобы прослушать голос
+              {isYandex
+                ? 'Yandex TTS скоро будет доступен'
+                : 'Нажмите кнопку воспроизведения, чтобы прослушать голос'}
             </p>
           </div>
         </div>
 
-        {/* Voice Settings */}
-        <div className="card">
-          <div className="flex items-center gap-2 mb-5">
-            <Volume2 className="w-5 h-5 text-gray-400" />
-            <h3 className="font-semibold text-gray-900">Настройки голоса</h3>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Stability */}
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <label className="text-sm text-gray-600">Стабильность</label>
-                <span className="text-sm font-semibold text-gray-900">
-                  {formData.stability.toFixed(2)}
-                </span>
-              </div>
-              <input
-                type="range"
-                name="stability"
-                min="0"
-                max="1"
-                step="0.01"
-                value={formData.stability}
-                onChange={handleChange}
-                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
-              />
-              <p className="text-xs text-gray-500 mt-1">Выше = стабильнее</p>
+        {/* Voice Settings - only for ElevenLabs */}
+        {formData.tts_provider === 'elevenlabs' && (
+          <div className="card">
+            <div className="flex items-center gap-2 mb-5">
+              <Volume2 className="w-5 h-5 text-gray-400" />
+              <h3 className="font-semibold text-gray-900">Настройки голоса ElevenLabs</h3>
             </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Stability */}
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                  <label className="text-sm text-gray-600">Стабильность</label>
+                  <span className="text-sm font-semibold text-gray-900">
+                    {formData.stability.toFixed(2)}
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  name="stability"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  value={formData.stability}
+                  onChange={handleChange}
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                />
+                <p className="text-xs text-gray-500 mt-1">Выше = стабильнее</p>
+              </div>
 
-            {/* Speed */}
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <label className="text-sm text-gray-600">Скорость</label>
-                <span className="text-sm font-semibold text-gray-900">
-                  {formData.speed.toFixed(2)}x
-                </span>
+              {/* Speed */}
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                  <label className="text-sm text-gray-600">Скорость</label>
+                  <span className="text-sm font-semibold text-gray-900">
+                    {formData.speed.toFixed(2)}x
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  name="speed"
+                  min="0.5"
+                  max="2"
+                  step="0.01"
+                  value={formData.speed}
+                  onChange={handleChange}
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                />
+                <p className="text-xs text-gray-500 mt-1">Скорость речи</p>
               </div>
-              <input
-                type="range"
-                name="speed"
-                min="0.5"
-                max="2"
-                step="0.01"
-                value={formData.speed}
-                onChange={handleChange}
-                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
-              />
-              <p className="text-xs text-gray-500 mt-1">Скорость речи</p>
-            </div>
 
-            {/* Similarity Boost */}
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <label className="text-sm text-gray-600">Схожесть</label>
-                <span className="text-sm font-semibold text-gray-900">
-                  {formData.similarity_boost.toFixed(2)}
-                </span>
+              {/* Similarity Boost */}
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                  <label className="text-sm text-gray-600">Схожесть</label>
+                  <span className="text-sm font-semibold text-gray-900">
+                    {formData.similarity_boost.toFixed(2)}
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  name="similarity_boost"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  value={formData.similarity_boost}
+                  onChange={handleChange}
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                />
+                <p className="text-xs text-gray-500 mt-1">Схожесть с оригиналом</p>
               </div>
-              <input
-                type="range"
-                name="similarity_boost"
-                min="0"
-                max="1"
-                step="0.01"
-                value={formData.similarity_boost}
-                onChange={handleChange}
-                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
-              />
-              <p className="text-xs text-gray-500 mt-1">Схожесть с оригиналом</p>
             </div>
           </div>
-        </div>
+        )}
+
+        {/* OpenAI Voice Settings */}
+        {formData.tts_provider === 'openai' && (
+          <div className="card">
+            <div className="flex items-center gap-2 mb-5">
+              <Volume2 className="w-5 h-5 text-gray-400" />
+              <h3 className="font-semibold text-gray-900">Настройки голоса OpenAI</h3>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Speed */}
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                  <label className="text-sm text-gray-600">Скорость</label>
+                  <span className="text-sm font-semibold text-gray-900">
+                    {formData.speed.toFixed(2)}x
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  name="speed"
+                  min="0.25"
+                  max="4"
+                  step="0.05"
+                  value={formData.speed}
+                  onChange={handleChange}
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                />
+                <p className="text-xs text-gray-500 mt-1">От 0.25x до 4x</p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Greeting Message */}
         <div className="card">
@@ -382,7 +489,11 @@ export default function StartCall() {
         )}
 
         {/* Submit Button */}
-        <button type="submit" disabled={loading} className="btn-primary w-full py-4 text-lg">
+        <button
+          type="submit"
+          disabled={loading || isYandex}
+          className="btn-primary w-full py-4 text-lg"
+        >
           {loading ? (
             <span className="flex items-center gap-2">
               <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">

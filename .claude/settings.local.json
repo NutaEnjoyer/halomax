@@ -19,7 +19,8 @@
       "Bash(xcopy:*)",
       "Bash(powershell -Command:*)",
       "Bash(npm run build:*)",
-      "Bash(npm uninstall:*)"
+      "Bash(npm uninstall:*)",
+      "Bash(alembic revision:*)"
     ]
   }
 }
