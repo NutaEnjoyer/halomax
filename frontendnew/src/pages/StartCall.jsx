@@ -15,10 +15,10 @@ const VOICES_BY_PROVIDER = {
   elevenlabs: [
     { label: 'Николай', voiceId: '3EuKHIEZbSzrHGNmdYsx', description: 'Уверенный и чёткий', mp3: 'Nikolay' },
     { label: 'Марина', voiceId: 'ymDCYd8puC7gYjxIamPt', description: 'Мягкий и тёплый', mp3: 'Marina' },
-    { label: 'Денис', voiceId: '0BcDz9UPwL3MpsnTeUlO', description: 'Приятный и дружелюбный', mp3: 'Denis' },
-    { label: 'Кари', voiceId: 'Jbte7ht1CqapnZvc4KpK', description: 'Тёплый и дружелюбный', mp3: 'Kari' },
-    { label: 'Мария', voiceId: 'EDpEYNf6XIeKYRzYcx4I', description: 'Спокойный и размеренный', mp3: 'Maria' },
-    { label: 'Максим', voiceId: 'HcaxAsrhw4ByUo4CBCBN', description: 'Спокойный и нейтральный', mp3: 'Maxim' },
+    // { label: 'Денис', voiceId: '0BcDz9UPwL3MpsnTeUlO', description: 'Приятный и дружелюбный', mp3: 'Denis' },
+    // { label: 'Кари', voiceId: 'Jbte7ht1CqapnZvc4KpK', description: 'Тёплый и дружелюбный', mp3: 'Kari' },
+    // { label: 'Мария', voiceId: 'EDpEYNf6XIeKYRzYcx4I', description: 'Спокойный и размеренный', mp3: 'Maria' },
+    // { label: 'Максим', voiceId: 'HcaxAsrhw4ByUo4CBCBN', description: 'Спокойный и нейтральный', mp3: 'Maxim' },
   ],
   openai: [
     { label: 'Alloy', voiceId: 'alloy', description: 'Нейтральный', mp3: 'alloy' },
