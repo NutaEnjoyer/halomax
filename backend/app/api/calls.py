@@ -152,6 +152,9 @@ async def create_call(
         greeting_message=call_data.greeting_message,
         prompt=call_data.prompt,
         funnel_goal=call_data.funnel_goal,
+        stability=call_data.stability,
+        speed=call_data.speed,
+        similarity_boost=call_data.similarity_boost,
         status=CallStatus.INITIATING
     )
 

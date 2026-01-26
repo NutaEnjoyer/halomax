@@ -162,6 +162,30 @@ function CallDetailsModal({ call: initialCall, onClose }) {
                 </div>
               </div>
 
+              {/* Voice Settings */}
+              {(call.speed !== null || call.stability !== null || call.similarity_boost !== null) && (
+                <div className="grid grid-cols-3 gap-3 mb-4 p-3 bg-white/10 rounded-lg">
+                  {call.speed !== null && call.speed !== undefined && (
+                    <div className="text-center">
+                      <p className="text-xs text-white/60 mb-1">Скорость</p>
+                      <p className="font-bold text-cyan-300">{call.speed}x</p>
+                    </div>
+                  )}
+                  {call.stability !== null && call.stability !== undefined && (
+                    <div className="text-center">
+                      <p className="text-xs text-white/60 mb-1">Стабильность</p>
+                      <p className="font-bold text-cyan-300">{Math.round(call.stability * 100)}%</p>
+                    </div>
+                  )}
+                  {call.similarity_boost !== null && call.similarity_boost !== undefined && (
+                    <div className="text-center">
+                      <p className="text-xs text-white/60 mb-1">Схожесть</p>
+                      <p className="font-bold text-cyan-300">{Math.round(call.similarity_boost * 100)}%</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* Expandable Prompt Section */}
               {call.prompt && (
                 <div className="border-t border-white/20 pt-4">

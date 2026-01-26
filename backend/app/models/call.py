@@ -44,6 +44,11 @@ class Call(Base):
     prompt = Column(Text, nullable=False)
     funnel_goal = Column(Text, nullable=False)  # Цель звонка (воронка)
 
+    # Voice settings
+    stability = Column(Float, nullable=True)  # ElevenLabs only
+    speed = Column(Float, nullable=True)  # Both ElevenLabs and OpenAI
+    similarity_boost = Column(Float, nullable=True)  # ElevenLabs only
+
     # Status tracking
     status = Column(Enum(CallStatus), default=CallStatus.INITIATING)
 

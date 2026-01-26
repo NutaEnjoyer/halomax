@@ -27,6 +27,11 @@ class CallResponse(BaseModel):
     greeting_message: str
     prompt: str
     funnel_goal: str
+    # Voice settings
+    stability: Optional[float] = None
+    speed: Optional[float] = None
+    similarity_boost: Optional[float] = None
+    # Status
     status: CallStatus
     call_id: Optional[str] = None
     voximplant_call_id: Optional[str] = None
