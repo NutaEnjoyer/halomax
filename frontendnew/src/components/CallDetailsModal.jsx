@@ -13,6 +13,12 @@ import {
   Target,
   User,
   Bot,
+  Volume2,
+  Mic,
+  FileText,
+  ChevronDown,
+  ChevronUp,
+  Settings,
 } from 'lucide-react';
 
 const DISPOSITION_LABELS = {
@@ -24,9 +30,16 @@ const DISPOSITION_LABELS = {
   continue_in_chat: 'Продолжить в чате',
 };
 
+const TTS_PROVIDER_LABELS = {
+  elevenlabs: 'ElevenLabs',
+  openai: 'OpenAI TTS',
+  yandex: 'Yandex SpeechKit',
+};
+
 export default function CallDetailsModal({ call: initialCall, onClose }) {
   const [call, setCall] = useState(initialCall);
   const [loading, setLoading] = useState(false);
+  const [isPromptExpanded, setIsPromptExpanded] = useState(false);
 
   useEffect(() => {
     if (initialCall.id && !initialCall.transcript) {
@@ -173,6 +186,61 @@ export default function CallDetailsModal({ call: initialCall, onClose }) {
                 <p className="text-gray-700 text-sm leading-relaxed">{call.summary}</p>
               </div>
             )}
+
+            {/* Call Settings - TTS, Voice, Prompt */}
+            <div className="p-4 bg-purple-50 border border-purple-100 rounded-lg">
+              <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <Settings size={16} className="text-purple-600" />
+                Настройки звонка
+              </h3>
+              <div className="grid grid-cols-2 gap-4 text-sm mb-4">
+                <div>
+                  <p className="text-gray-500 mb-1 flex items-center gap-1">
+                    <Volume2 size={12} />
+                    TTS Провайдер
+                  </p>
+                  <p className="font-medium text-gray-900">
+                    {TTS_PROVIDER_LABELS[call.tts_provider] || call.tts_provider || 'Не указан'}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-gray-500 mb-1 flex items-center gap-1">
+                    <Mic size={12} />
+                    Голос
+                  </p>
+                  <p className="font-medium text-gray-900 text-xs break-all">
+                    {call.voice || 'Не указан'}
+                  </p>
+                </div>
+              </div>
+
+              {/* Expandable Prompt Section */}
+              {call.prompt && (
+                <div className="border-t border-purple-200 pt-4">
+                  <button
+                    onClick={() => setIsPromptExpanded(!isPromptExpanded)}
+                    className="w-full flex items-center justify-between text-left hover:bg-purple-100 rounded-lg p-2 -m-2 transition-colors"
+                  >
+                    <span className="text-gray-500 flex items-center gap-1">
+                      <FileText size={12} />
+                      <span className="text-sm">Промпт</span>
+                    </span>
+                    <span className="flex items-center gap-2 text-purple-600 text-sm font-medium">
+                      {isPromptExpanded ? 'Свернуть' : 'Посмотреть'}
+                      {isPromptExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                    </span>
+                  </button>
+
+                  {isPromptExpanded && (
+                    <div className="mt-3 p-3 bg-white rounded-lg border border-purple-200 max-h-60 overflow-y-auto">
+                      <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap">
+                        {call.prompt}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
 
             {/* CRM Info */}
             <div className="p-4 bg-gray-50 rounded-lg">

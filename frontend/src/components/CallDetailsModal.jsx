@@ -10,9 +10,16 @@ const DISPOSITION_LABELS = {
   continue_in_chat: 'Продолжить в чате',
 };
 
+const TTS_PROVIDER_LABELS = {
+  elevenlabs: 'ElevenLabs',
+  openai: 'OpenAI TTS',
+  yandex: 'Yandex SpeechKit',
+};
+
 function CallDetailsModal({ call: initialCall, onClose }) {
   const [call, setCall] = useState(initialCall);
   const [loading, setLoading] = useState(false);
+  const [isPromptExpanded, setIsPromptExpanded] = useState(false);
 
   useEffect(() => {
     // Fetch full call details if needed
@@ -136,6 +143,49 @@ function CallDetailsModal({ call: initialCall, onClose }) {
                 <p className="text-white/80 leading-relaxed">{call.summary}</p>
               </div>
             )}
+
+            {/* Call Settings - TTS, Voice, Prompt */}
+            <div className="glass-card rounded-xl p-6 border-l-4 border-cyan-500">
+              <h3 className="font-bold text-white mb-4 text-lg">Настройки звонка</h3>
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                  <p className="text-xs font-bold text-white/70 mb-2 uppercase tracking-wide">TTS Провайдер</p>
+                  <p className="text-white font-medium">
+                    {TTS_PROVIDER_LABELS[call.tts_provider] || call.tts_provider || 'Не указан'}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-white/70 mb-2 uppercase tracking-wide">Голос</p>
+                  <p className="text-white font-medium text-sm break-all">
+                    {call.voice || 'Не указан'}
+                  </p>
+                </div>
+              </div>
+
+              {/* Expandable Prompt Section */}
+              {call.prompt && (
+                <div className="border-t border-white/20 pt-4">
+                  <button
+                    onClick={() => setIsPromptExpanded(!isPromptExpanded)}
+                    className="w-full flex items-center justify-between text-left hover:bg-white/10 rounded-lg p-2 -m-2 transition-colors"
+                  >
+                    <span className="text-xs font-bold text-white/70 uppercase tracking-wide">Промпт</span>
+                    <span className="flex items-center gap-2 text-cyan-300 text-sm font-medium">
+                      {isPromptExpanded ? 'Свернуть' : 'Посмотреть'}
+                      <span className="text-lg">{isPromptExpanded ? '▲' : '▼'}</span>
+                    </span>
+                  </button>
+
+                  {isPromptExpanded && (
+                    <div className="mt-3 p-4 bg-white/10 rounded-xl max-h-60 overflow-y-auto">
+                      <p className="text-white/90 text-sm leading-relaxed whitespace-pre-wrap">
+                        {call.prompt}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
 
             <div className="glass-card rounded-xl p-6 border-l-4 border-purple-500">
               <h3 className="font-bold text-white mb-4 text-lg">Информация CRM</h3>

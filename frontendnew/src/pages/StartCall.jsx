@@ -43,13 +43,13 @@ const VOICES_BY_PROVIDER = {
     { label: 'Sage', voiceId: 'sage', description: 'Мудрый', mp3: 'sage' },
   ],
   yandex: [
-    { label: 'Алёна', voiceId: 'alena', description: 'Женский, нейтральный', mp3: null },
-    { label: 'Филипп', voiceId: 'filipp', description: 'Мужской, нейтральный', mp3: null },
-    { label: 'Ермиль', voiceId: 'ermil', description: 'Мужской, нейтральный', mp3: null },
-    { label: 'Жанна', voiceId: 'jane', description: 'Женский, нейтральный', mp3: null },
-    { label: 'Мадирус', voiceId: 'madirus', description: 'Мужской, нейтральный', mp3: null },
-    { label: 'Омаж', voiceId: 'omazh', description: 'Женский, нейтральный', mp3: null },
-    { label: 'Захар', voiceId: 'zahar', description: 'Мужской, нейтральный', mp3: null },
+    { label: 'Алёна', voiceId: 'alena', description: 'Женский, нейтральный', mp3: 'alena' },
+    { label: 'Филипп', voiceId: 'filipp', description: 'Мужской, нейтральный', mp3: 'filipp' },
+    { label: 'Ермиль', voiceId: 'ermil', description: 'Мужской, нейтральный', mp3: 'ermil' },
+    { label: 'Жанна', voiceId: 'jane', description: 'Женский, нейтральный', mp3: 'jane' },
+    { label: 'Мадирус', voiceId: 'madirus', description: 'Мужской, нейтральный', mp3: 'madirus' },
+    { label: 'Омаж', voiceId: 'omazh', description: 'Женский, нейтральный', mp3: 'omazh' },
+    { label: 'Захар', voiceId: 'zahar', description: 'Мужской, нейтральный', mp3: 'zahar' },
   ],
 };
 
