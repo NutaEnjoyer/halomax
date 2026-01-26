@@ -36,6 +36,35 @@ const TTS_PROVIDER_LABELS = {
   yandex: 'Yandex SpeechKit',
 };
 
+// Voice ID to Label mapping
+const VOICE_LABELS = {
+  // ElevenLabs
+  '3EuKHIEZbSzrHGNmdYsx': 'Николай',
+  'ymDCYd8puC7gYjxIamPt': 'Марина',
+  '0BcDz9UPwL3MpsnTeUlO': 'Денис',
+  'Jbte7ht1CqapnZvc4KpK': 'Кари',
+  'EDpEYNf6XIeKYRzYcx4I': 'Мария',
+  'HcaxAsrhw4ByUo4CBCBN': 'Максим',
+  // OpenAI
+  'alloy': 'Alloy',
+  'echo': 'Echo',
+  'fable': 'Fable',
+  'onyx': 'Onyx',
+  'nova': 'Nova',
+  'shimmer': 'Shimmer',
+  'ash': 'Ash',
+  'coral': 'Coral',
+  'sage': 'Sage',
+  // Yandex
+  'alena': 'Алёна',
+  'filipp': 'Филипп',
+  'ermil': 'Ермиль',
+  'jane': 'Жанна',
+  'madirus': 'Мадирус',
+  'omazh': 'Омаж',
+  'zahar': 'Захар',
+};
+
 export default function CallDetailsModal({ call: initialCall, onClose }) {
   const [call, setCall] = useState(initialCall);
   const [loading, setLoading] = useState(false);
@@ -208,8 +237,8 @@ export default function CallDetailsModal({ call: initialCall, onClose }) {
                     <Mic size={12} />
                     Голос
                   </p>
-                  <p className="font-medium text-gray-900 text-xs break-all">
-                    {call.voice || 'Не указан'}
+                  <p className="font-medium text-gray-900">
+                    {VOICE_LABELS[call.voice] || call.voice || 'Не указан'}
                   </p>
                 </div>
               </div>
