@@ -94,7 +94,7 @@ class OpenAIService:
 
         try:
             response = await self.client.chat.completions.create(
-                model="gpt-4",
+                model="gpt-4o-mini",
                 messages=[
                     {"role": "system", "content": "Ты аналитик телефонных звонков продаж. Всегда отвечай только валидным JSON, без дополнительного текста или форматирования. Все текстовые поля должны быть на русском языке."},
                     {"role": "user", "content": analysis_prompt}
