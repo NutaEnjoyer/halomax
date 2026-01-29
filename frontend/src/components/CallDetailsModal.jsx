@@ -13,6 +13,7 @@ const DISPOSITION_LABELS = {
 const TTS_PROVIDER_LABELS = {
   elevenlabs: 'ElevenLabs',
   openai: 'OpenAI TTS',
+  qwen: 'Qwen TTS',
   yandex: 'Yandex SpeechKit',
 };
 

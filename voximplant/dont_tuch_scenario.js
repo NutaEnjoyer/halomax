@@ -2,7 +2,7 @@ require(Modules.OpenAI);
 require(Modules.ElevenLabs);
 require(Modules.Yandex);
 
-var callId, ttsProvider, targetPhone, callerIdPhone, voiceType, language, stability, speed, similarityBoost, greetingMessage, systemPrompt, funnelGoal, webhookUrl, openaiApiKey, elevenlabsApiKey, elevenLabsAgentId, yandexApiKey, yandexFolderId, qwenApiKey;
+var callId, ttsProvider, targetPhone, callerIdPhone, voiceType, language, stability, speed, similarityBoost, greetingMessage, systemPrompt, funnelGoal, webhookUrl, openaiApiKey, elevenlabsApiKey, elevenLabsAgentId, yandexApiKey, yandexFolderId;
 
 var transcript = []  // Транскрипция
 
@@ -56,7 +56,6 @@ VoxEngine.addEventListener(AppEvents.Started, function(e) {
     elevenLabsAgentId = data.elevenlabs_agent_id;
     yandexApiKey = data.yandex_api_key;
     yandexFolderId = data.yandex_folder_id;
-    qwenApiKey = data.qwen_api_key;
     stability = data.stability || null;
     speed = data.speed || null;
     similarityBoost = data.similarity_boost || null;
@@ -78,7 +77,6 @@ VoxEngine.addEventListener(AppEvents.Started, function(e) {
     Logger.write("elevenLabsAgentId: " + elevenLabsAgentId);
     Logger.write("yandexApiKey: " + yandexApiKey);
     Logger.write("yandexFolderId: " + yandexFolderId);
-    Logger.write("qwenApiKey: " + (qwenApiKey ? "***SET***" : "NOT SET"));
     Logger.write("stability: " + stability);
     Logger.write("speed: " + speed);
     Logger.write("similarityBoost: " + similarityBoost);
@@ -100,10 +98,6 @@ VoxEngine.addEventListener(AppEvents.Started, function(e) {
         call.addEventListener(CallEvents.Connected, onCallConnectedYandex);
         call.addEventListener(CallEvents.Disconnected, onCallDisconnectedYandex);
         call.addEventListener(CallEvents.Failed, onCallFailedYandex);
-    } else if (ttsProvider === "qwen") {
-        call.addEventListener(CallEvents.Connected, onCallConnectedQwen);
-        call.addEventListener(CallEvents.Disconnected, onCallDisconnectedQwen);
-        call.addEventListener(CallEvents.Failed, onCallFailedQwen);
     }
 });
 
@@ -760,190 +754,6 @@ function onCallDisconnectedYandex () {
 
 function onCallFailedYandex(e) {
     Logger.write("[FAILED] " + e.code + " - " + e.reason);
-    VoxEngine.terminate();
-}
-
-// ==================================
-// 📞 Обработчики звонка Qwen
-// ==================================
-
-var qwenWs = null;
-var qwenCurrentAssistantText = "";
-
-async function onCallConnectedQwen() {
-    Logger.write("[QWEN] Call connected");
-    callStartTimestamp = Date.now();
-
-    function addToTranscript(role, text) {
-        if (text && text.trim()) {
-            transcript.push(`${role}: ${text.trim()}`);
-            Logger.write("[TRANSCRIPT] " + role + ": " + text.trim());
-        }
-    }
-
-    var wsOptions = {
-        headers: {
-            "Authorization": "Bearer " + qwenApiKey,
-            "X-DashScope-OmniRTC": "true"
-        }
-    };
-
-    try {
-        qwenWs = Net.WebSocket.create('wss://dashscope-intl.aliyuncs.com/api-ws/v1/realtime', [], wsOptions);
-
-        qwenWs.onopen = function() {
-            Logger.write("[QWEN WS] Connected to DashScope");
-
-            var fullChangedPrompt = "ВСЕГДА начинай новый диалог с ФРАЗЫ '" + greetingMessage + "' ГОВОРИ ЕЕ ПЕРВЫМ СООБЩЕНИЕМ И БОЛЬШЕ НЕ ПОВТОРЯЙ. ПЕРВОЕ СООБЩЕНИЕ ДОЛЖНО БЫТЬ ТОЛЬКО ЭТА ФРАЗА И ВСЕ!\n\nЦЕЛЬ ЗВОНКА (ВОРОНКА): " + funnelGoal + "\n\nСИСТЕМНАЯ ИНСТРУКЦИЯ: " + systemPrompt;
-
-            // Настройка сессии
-            qwenWs.send(JSON.stringify({
-                type: 'session.update',
-                session: {
-                    model: 'qwen2.5-omni-7b',
-                    modalities: ["audio", "text"],
-                    instructions: fullChangedPrompt,
-                    voice: voiceType || 'Chelsie',
-                    input_audio_format: 'pcm16',
-                    output_audio_format: 'pcm16',
-                    input_audio_transcription: {
-                        model: 'whisper-1'
-                    },
-                    turn_detection: {
-                        type: 'server_vad',
-                        threshold: 0.5,
-                        silence_duration_ms: 500,
-                        prefix_padding_ms: 300
-                    }
-                }
-            }));
-
-            Logger.write("[QWEN] Session configured");
-        };
-
-        qwenWs.onmessage = function(evt) {
-            var msg;
-            try {
-                msg = JSON.parse(evt.data);
-            } catch (e) {
-                Logger.write("[QWEN WS] Failed to parse message: " + evt.data);
-                return;
-            }
-
-            Logger.write("[QWEN WS] Message type: " + msg.type);
-
-            if (msg.type === 'session.created' || msg.type === 'session.updated') {
-                Logger.write("[QWEN] Session ready");
-            } else if (msg.type === 'response.audio.delta') {
-                // Аудио чанк от сервера - отправляем в звонок
-                if (msg.delta && call) {
-                    // Декодируем base64 и отправляем в call
-                    var audioData = msg.delta;
-                    // call.sendAudio(audioData); // Нужно проверить формат
-                    Logger.write("[QWEN AUDIO] Received audio chunk");
-                }
-            } else if (msg.type === 'response.audio_transcript.delta') {
-                // Дельта транскрипции ассистента
-                if (msg.delta) {
-                    qwenCurrentAssistantText += msg.delta;
-                    Logger.write("[QWEN ASSISTANT DELTA] " + msg.delta);
-                }
-            } else if (msg.type === 'response.audio_transcript.done') {
-                // Завершение транскрипции ассистента
-                if (qwenCurrentAssistantText) {
-                    addToTranscript("Агент", qwenCurrentAssistantText);
-                    qwenCurrentAssistantText = "";
-                }
-            } else if (msg.type === 'conversation.item.input_audio_transcription.completed') {
-                // Транскрипция пользователя
-                if (msg.transcript) {
-                    addToTranscript("Пользователь", msg.transcript);
-                }
-            } else if (msg.type === 'input_audio_buffer.speech_started') {
-                Logger.write("[QWEN] User speech started - interrupting");
-                // Прерывание TTS
-                qwenWs.send(JSON.stringify({ type: 'response.cancel' }));
-            } else if (msg.type === 'error') {
-                Logger.write("[QWEN ERROR] " + JSON.stringify(msg.error));
-            } else if (msg.type === 'response.done') {
-                Logger.write("[QWEN] Response completed");
-            }
-        };
-
-        qwenWs.onclose = function() {
-            Logger.write("[QWEN WS] Connection closed");
-        };
-
-        qwenWs.onerror = function(err) {
-            Logger.write("[QWEN WS ERROR] " + err);
-            if (call) call.hangup();
-        };
-
-        // Связываем аудио с WebSocket
-        // Отправляем аудио от звонка в WebSocket
-        call.addEventListener(CallEvents.PlaybackFinished, function() {
-            Logger.write("[QWEN] Playback finished");
-        });
-
-        // Записываем звонок для получения аудио
-        call.record({hd_audio: true, stereo: false});
-
-    } catch (error) {
-        Logger.write("[QWEN ERROR] " + error);
-        VoxEngine.terminate();
-    }
-}
-
-function onCallDisconnectedQwen() {
-    Logger.write("[QWEN] Call disconnected");
-
-    if (qwenWs) {
-        qwenWs.send(JSON.stringify({ type: 'session.finish' }));
-        qwenWs.close();
-        qwenWs = null;
-    }
-
-    var callDurationSeconds = 0;
-    if (callStartTimestamp) {
-        callDurationSeconds = Math.floor((Date.now() - callStartTimestamp) / 1000);
-    }
-
-    Logger.write("[CALL DURATION] " + callDurationSeconds + " seconds");
-    Logger.write("[FULL TRANSCRIPT]\n" + (transcript.join("\n") || "(empty)"));
-
-    // Отправляем на webhook
-    if (webhookUrl) {
-        var finalUrl = webhookUrl;
-        if (webhookUrl.indexOf('/api/call-transcript') === -1) {
-            finalUrl = webhookUrl + '/api/call-transcript';
-        }
-
-        Logger.write("[WEBHOOK] Sending to: " + finalUrl);
-
-        Net.httpRequestAsync(finalUrl, {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            postData: JSON.stringify({
-                call_id: callId,
-                phone: targetPhone,
-                duration_seconds: callDurationSeconds,
-                transcript: transcript,
-                raw_text: transcript
-            })
-        }).then(function(response) {
-            Logger.write("[WEBHOOK] Sent. Status: " + response.code);
-            VoxEngine.terminate();
-        }).catch(function(err) {
-            Logger.write("[WEBHOOK ERROR] " + err);
-            VoxEngine.terminate();
-        });
-    } else {
-        VoxEngine.terminate();
-    }
-}
-
-function onCallFailedQwen(e) {
-    Logger.write("[QWEN FAILED] " + e.code + " - " + e.reason);
     VoxEngine.terminate();
 }
 

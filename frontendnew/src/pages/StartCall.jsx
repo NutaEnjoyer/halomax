@@ -18,6 +18,7 @@ const Tooltip = ({ text }) => (
 const TTS_PROVIDERS = [
   { id: 'elevenlabs', name: 'ElevenLabs', description: 'Высокое качество, русские голоса' },
   { id: 'openai', name: 'OpenAI', description: 'Быстрый, многоязычный' },
+  { id: 'qwen', name: 'Qwen', description: 'Быстрый, многоязычный' },
   { id: 'yandex', name: 'Yandex', description: 'Русские голоса, низкая цена' },
 ];
 
@@ -50,6 +51,12 @@ const VOICES_BY_PROVIDER = {
     { label: 'Мадирус', voiceId: 'madirus', description: 'Мужской, нейтральный', mp3: 'madirus' },
     { label: 'Омаж', voiceId: 'omazh', description: 'Женский, нейтральный', mp3: 'omazh' },
     { label: 'Захар', voiceId: 'zahar', description: 'Мужской, нейтральный', mp3: 'zahar' },
+  ],
+  qwen: [
+    { label: 'Chelsie', voiceId: 'Chelsie', description: 'Женский, нейтральный', mp3: 'chelsie' },
+    { label: 'Ethan', voiceId: 'Ethan', description: 'Мужской, нейтральный', mp3: 'ethan' },
+    { label: 'Cherry', voiceId: 'Cherry', description: 'Женский, нейтральный', mp3: 'cherry' },
+    { label: 'Serena', voiceId: 'Serena', description: 'Женский, нейтральный', mp3: 'serena' },
   ],
 };
 
@@ -471,6 +478,40 @@ export default function StartCall() {
                   min="0.1"
                   max="3"
                   step="0.1"
+                  value={formData.speed}
+                  onChange={handleChange}
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Qwen Voice Settings */}
+        {formData.tts_provider === 'qwen' && (
+          <div className="card">
+            <div className="flex items-center gap-2 mb-5">
+              <Volume2 className="w-5 h-5 text-gray-400" />
+              <h3 className="font-semibold text-gray-900">Настройки голоса Qwen</h3>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Speed */}
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                  <div className="flex items-center">
+                    <label className="text-sm text-gray-600">Скорость</label>
+                    <Tooltip text="Контролирует скорость генерируемой речи. Значения ниже 1.0 замедлят речь, в то время как значения выше 1.0 ускорят её." />
+                  </div>
+                  <span className="text-sm font-semibold text-gray-900">
+                    {formData.speed.toFixed(2)}x
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  name="speed"
+                  min="0.25"
+                  max="4"
+                  step="0.05"
                   value={formData.speed}
                   onChange={handleChange}
                   className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"

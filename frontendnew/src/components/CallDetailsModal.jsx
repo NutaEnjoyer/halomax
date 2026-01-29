@@ -33,6 +33,7 @@ const DISPOSITION_LABELS = {
 const TTS_PROVIDER_LABELS = {
   elevenlabs: 'ElevenLabs',
   openai: 'OpenAI TTS',
+  qwen: 'Qwen TTS',
   yandex: 'Yandex SpeechKit',
 };
 
@@ -63,6 +64,11 @@ const VOICE_LABELS = {
   'madirus': 'Мадирус',
   'omazh': 'Омаж',
   'zahar': 'Захар',
+  // Qwen
+  'Chelsie': 'Chelsie',
+  'Ethan': 'Ethan',
+  'Cherry': 'Cherry',
+  'Serena': 'Serena',
 };
 
 export default function CallDetailsModal({ call: initialCall, onClose }) {

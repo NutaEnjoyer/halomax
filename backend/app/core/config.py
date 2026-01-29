@@ -30,6 +30,9 @@ class Settings(BaseSettings):
     YANDEX_API_KEY: Optional[str] = None
     YANDEX_FOLDER_ID: Optional[str] = None
 
+    # Qwen
+    QWEN_API_KEY: Optional[str] = None
+
     # Webhook
     WEBHOOK_URL: str
 
